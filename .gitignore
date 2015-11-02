@@ -32,4 +32,8 @@
 *.dSYM/
 
 # Project specific files
+bin/*
 *.pdf
+include/y.tab.h
+src/matc.c
+src/y.tab.c
