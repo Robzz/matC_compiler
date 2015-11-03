@@ -11,18 +11,22 @@ LDFLAGS=-lfl -ly
 
 all: dirs $(BIN_DIR)/$(TARGET)
 
+# Linkage
 $(BIN_DIR)/$(TARGET): $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/matc.o 
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-$(SRC_DIR)/y.tab.c: make_yacc
-
-$(INCLUDE_DIR)/y.tab.h: make_yacc
-
+# Compile C sources
 $(OBJ_DIR)/y.tab.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(OBJ_DIR)/matc.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h
 	$(CC) $(CFLAGS) -o $@ $<
+
+# Lex/Yacc targets
+$(SRC_DIR)/y.tab.c: make_yacc
+
+$(INCLUDE_DIR)/y.tab.h: make_yacc
+
 
 $(SRC_DIR)/matc.c: $(SRC_DIR)/matc.lex
 	flex -o $@ $<
@@ -30,6 +34,20 @@ $(SRC_DIR)/matc.c: $(SRC_DIR)/matc.lex
 make_yacc: $(SRC_DIR)/matc.y
 	yacc -v --defines=$(INCLUDE_DIR)/y.tab.h -o $(SRC_DIR)/y.tab.c $<
 
+# Testing targets
+all_tests: test_lex test_yacc
+
+test_lex: $(BIN_DIR)/lexer
+
+$(BIN_DIR)/lexer: $(OBJ_DIR)/matc.o
+	$(CC) $< -o $@ $(LDFLAGS)
+
+test_yacc: $(BIN_DIR)/parser
+
+$(BIN_DIR)/parser: $(OBJ_DIR)/matc.o $(OBJ_DIR)/y.tab.o
+	$(CC) $^ -o $@ $(LDFLAGS)
+
+# Clean targets
 mrproper: clean
 	rm -rf bin
 
@@ -42,6 +60,7 @@ dist: matc_chavignat_laisne.tar.gz
 matc_chavignat_laisne.tar.gz: clean $(SRC_DIR) $(INCLUDE_DIR) Makefile
 	tar -acf $@ $^
 
+# Make directories in build tree
 dirs:
 	mkdir -p $(BIN_DIR) $(OBJ_DIR)
 

@@ -1,0 +1,4 @@
+int main() {
+    float det;
+    matrix m[1];
+}
