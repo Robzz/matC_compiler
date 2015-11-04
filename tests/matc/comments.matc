@@ -1,0 +1,10 @@
+int main() {
+    // This is a single line comment
+    float f = 42.0; // This a comment after a statement
+
+    /* This is a multine
+       comment */
+
+    /* This too, except it
+     * is kinda messed up */
+}
