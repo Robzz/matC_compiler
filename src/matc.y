@@ -51,10 +51,18 @@ decl_id: id { printf("Declaring variable %s\n", $1); }
 
 assignment: id '=' value
 
-initialized_declaration : type_name decl_list '=' value_list { printf("Declare and initialize\n"); }
+initialized_declaration : type_name initialization_list
 
-value_list: value
-           | value_list ',' value
+initialization_list: initialization
+                     | initialization_list ',' initialization
+
+initialization: decl_id '=' value { printf("Initializing variable\n"); }
+
+number_list: number
+           | number_list ',' number
+
+line_list: matrix_line
+           | line_list ',' matrix_line
 
 type_name: MATRIX
            | INT
@@ -65,7 +73,10 @@ type_name: MATRIX
 value: number
        | matrix_value
 
-matrix_value: 
+matrix_value: matrix_line
+              | '{' line_list '}'
+
+matrix_line: '{' number_list '}'
 
 number : integer { printf("int : %d\n", $1); }
          | fp { printf("float : %f\n", $1); }
@@ -73,6 +84,6 @@ number : integer { printf("int : %d\n", $1); }
 %%
 
 int main(int argc, char** argv) {
-//    yydebug = 1;
+    //yydebug = 1;
     return yyparse();
 }

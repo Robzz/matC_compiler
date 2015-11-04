@@ -1,0 +1,6 @@
+int main() {
+    matrix m1[1];
+    matrix m2[3][3];
+    matrix m3[3] = { 1, 2, 3 };
+    matrix m4[2][3] = { {1, 2, 3}, {4, 5, 6} };
+}
