@@ -31,7 +31,7 @@ if [[ $TEST_LEX != 0 ]]; then
         exit 1
     fi
     for f in ./tests/matc/* ; do
-        if ./bin/lexer < "$f" > /dev/null ; then
+        if ./bin/lexer < "$f" 1&> /dev/null ; then
             echo -e 'Lexing test file '"$f"': \e[32mSUCCESS\e[0m'
         else
             echo -e 'Lexing test file '"$f"': \e[31mFAILURE\e[0m'
@@ -46,7 +46,7 @@ if [[ $TEST_YACC != 0 ]]; then
         exit 1
     fi
     for f in tests/matc/* ; do
-        if ./bin/parser < "$f" > /dev/null ; then
+        if ./bin/parser < "$f" 1&> /dev/null ; then
             echo -e 'Parsing test file '"$f"': \e[32mSUCCESS\e[0m'
         else
             echo -e 'Parsing test file '"$f"': \e[31mFAILURE\e[0m'
