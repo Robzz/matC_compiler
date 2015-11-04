@@ -22,6 +22,9 @@ $(OBJ_DIR)/y.tab.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h
 $(OBJ_DIR)/matc.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h
 	$(CC) $(CFLAGS) -o $@ $<
 
+# Compilation in debug mode
+
+
 # Lex/Yacc targets
 $(SRC_DIR)/y.tab.c: $(SRC_DIR)/matc.y
 	yacc -v --defines=$(INCLUDE_DIR)/y.tab.h -o $(SRC_DIR)/y.tab.c $<
@@ -43,10 +46,10 @@ $(BIN_DIR)/lexer: $(OBJ_DIR)/matc_test.o $(OBJ_DIR)/y.tab_test.o
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_DIR)/y.tab_test.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h
-	$(CC) $(CFLAGS) -DLEXER_TEST_BUILD -o $@ $<
+	$(CC) $(CFLAGS) -DDEBUG -DLEXER_TEST_BUILD -o $@ $<
 
 $(OBJ_DIR)/matc_test.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h
-	$(CC) $(CFLAGS) -DLEXER_TEST_BUILD -o $@ $<
+	$(CC) $(CFLAGS) -DDEBUG -DLEXER_TEST_BUILD -o $@ $<
 
 # Parser test
 test_yacc: $(BIN_DIR)/parser

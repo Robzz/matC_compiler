@@ -1,16 +1,9 @@
 %{
 
 #include "y.tab.h"
+#include "debug.h"
 
 extern void yyerror(char*);
-
-#ifdef DEBUG
-#define DBG(p) p
-#endif
-
-#ifndef DBG
-#define DBG(p)
-#endif
 
 %}
 
@@ -47,14 +40,7 @@ STRING_LITERAL \"[^"]*\"
 {MAIN}      { return MAIN; }
 {IDENT}     { DBG(printf("Lex : identifier : %s\n", yytext)); yylval.s = malloc((yyleng+1)*sizeof(char)); strcpy(yylval.s, yytext); return id; }
 [-+*/~=(){};,.\[\]] { return *yytext; }
-[ \t]               ;
+[ \t\n]               ;
 .                   { yyerror("Unknown character\n"); }
 
 %%
-
-#ifdef LEXER_TEST_BUILD
-int main(int argc, char** argv) {
-    while(yylex()) { }
-    return 0;
-}
-#endif
