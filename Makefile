@@ -63,11 +63,11 @@ mrproper: clean
 
 clean:
 	rm -rf obj/*
-	rm -f $(INCLUDE_DIR)/y.tab.h $(SRC_DIR)/y.tab.c $(SRC_DIR)/matc.c
+	rm -f $(INCLUDE_DIR)/y.tab.h $(SRC_DIR)/y.tab.c $(SRC_DIR)/matc.c $(SRC_DIR)/y.output
 
-dist: matc_chavignat_laisne.tar.gz
+dist: clean matc_chavignat_laisne.tar.gz
 
-matc_chavignat_laisne.tar.gz: clean $(SRC_DIR) $(INCLUDE_DIR) Makefile
+matc_chavignat_laisne.tar.gz: $(SRC_DIR) $(INCLUDE_DIR) Makefile tests run_tests.sh
 	tar -acf $@ $^
 
 # Make directories in build tree
