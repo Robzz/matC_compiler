@@ -40,17 +40,21 @@ instr: declaration ';' { printf("Declaration\n"); }
        | assignment ';' { printf("Assigment\n"); }
        | initialized_declaration ';' { printf("Declare and initialize\n"); }
 
-declaration: type_name id
-             | matrix_declaration
+declaration: type_name decl_list
 
-matrix_declaration: MATRIX id '[' integer ']'
-                    | MATRIX id '[' integer ']' '[' integer ']'
+decl_list: decl_id
+           | decl_list ',' decl_id
+
+decl_id: id { printf("Declaring variable %s\n", $1); }
+         | id '[' integer ']' { printf("Declaring 1D matrix %s (size %d)\n", $1, $3); }
+         | id '[' integer ']' '[' integer ']' { printf("Declaring 2D matrix %s (size (%d,%d))\n", $1, $3, $6); }
 
 assignment: id '=' value
 
 initialized_declaration : type_name id '=' value { printf("Declare and initialize\n"); }
 
-type_name: INT
+type_name: MATRIX
+           | INT
            | FLOAT
            | VOID
            | id { printf("Identifier : %s\n", $1); }

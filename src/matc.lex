@@ -32,7 +32,7 @@ MAIN main
 {VOID}      { return VOID; }
 {MAIN}      { return MAIN; }
 {IDENT}     { printf("Lex : identifier : %s\n", yytext); yylval.s = malloc((yyleng+1)*sizeof(char)); strcpy(yylval.s, yytext); return id; }
-[-+*/~=(){};.\[\]] { return *yytext; }
+[-+*/~=(){};,.\[\]] { return *yytext; }
 [ \t]               ;
 .                   { printf("Lex : Unknown character %c\n", *yytext); };
 
