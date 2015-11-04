@@ -23,16 +23,15 @@ $(OBJ_DIR)/matc.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 # Lex/Yacc targets
-$(SRC_DIR)/y.tab.c: make_yacc
+$(SRC_DIR)/y.tab.c: $(SRC_DIR)/matc.y
+	yacc -v --defines=$(INCLUDE_DIR)/y.tab.h -o $(SRC_DIR)/y.tab.c $<
 
-$(INCLUDE_DIR)/y.tab.h: make_yacc
+$(INCLUDE_DIR)/y.tab.h: $(SRC_DIR)/matc.y
+	yacc -v --defines=$(INCLUDE_DIR)/y.tab.h -o $(SRC_DIR)/y.tab.c $<
 
 
 $(SRC_DIR)/matc.c: $(SRC_DIR)/matc.lex
 	flex -o $@ $<
-
-make_yacc: $(SRC_DIR)/matc.y
-	yacc -v --defines=$(INCLUDE_DIR)/y.tab.h -o $(SRC_DIR)/y.tab.c $<
 
 # Testing targets
 all_tests: test_lex test_yacc
@@ -60,8 +59,8 @@ mrproper: clean
 	rm -rf bin
 
 clean:
-	rm -rf obj
-	rm -f $(INCLUDE_DIR)/y.tab.h $(SRC_DIR)/.c
+	rm -rf obj/*
+	rm -f $(INCLUDE_DIR)/y.tab.h $(SRC_DIR)/y.tab.c $(SRC_DIR)/matc.c
 
 dist: matc_chavignat_laisne.tar.gz
 
