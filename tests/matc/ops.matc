@@ -1,0 +1,9 @@
+int main() {
+    int a = 1 + 1, b = 2 * 3;
+    a = (-b) / 2;
+    int c = a + b;
+    int d = a - b / c;
+    int e = (a - b) / c;
+
+    return 0;
+}
