@@ -25,6 +25,12 @@ void yyerror(char* str) {
 %token FLOAT
 %token VOID
 %token MAIN
+%token NEQ
+%token EQ
+%token INCR
+%token DECR
+%token AND
+%token OR
 
 %token integer
 %token fp /* float */
