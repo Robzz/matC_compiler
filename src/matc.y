@@ -51,7 +51,10 @@ decl_id: id { printf("Declaring variable %s\n", $1); }
 
 assignment: id '=' value
 
-initialized_declaration : type_name id '=' value { printf("Declare and initialize\n"); }
+initialized_declaration : type_name decl_list '=' value_list { printf("Declare and initialize\n"); }
+
+value_list: value
+           | value_list ',' value
 
 type_name: MATRIX
            | INT

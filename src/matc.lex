@@ -18,9 +18,11 @@ INT int
 FLOAT float
 VOID void
 MAIN main
+INLINE_COMMENT \/\/.*$
 
 %%
 
+{INLINE_COMMENT}          { printf("Lex : found comment, ignoring\n"); }
 {SIGN}{FLOAT_LITERAL}     { printf("Lex : float %s\n", yytext);
                             float f = strtof(yytext, NULL); 
                             yylval.f = f;
@@ -34,6 +36,6 @@ MAIN main
 {IDENT}     { printf("Lex : identifier : %s\n", yytext); yylval.s = malloc((yyleng+1)*sizeof(char)); strcpy(yylval.s, yytext); return id; }
 [-+*/~=(){};,.\[\]] { return *yytext; }
 [ \t]               ;
-.                   { printf("Lex : Unknown character %c\n", *yytext); };
+.                   { printf("Lex : Unknown character %c\n", *yytext); }
 
 %%

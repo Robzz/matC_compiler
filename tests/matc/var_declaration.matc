@@ -1,4 +1,5 @@
 int main() {
+    // Test pure declarations
     float det;
     int i1, i2;
     matrix m1[1];
