@@ -1,9 +1,17 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
 
 int yylex();
 
+#ifndef LEXER_TEST_BUILD
 void yyerror(char* str) { printf("%s\n", str); };
+#else
+void yyerror(char* str) {
+    fprintf(stderr, str);
+    exit(1);
+}
+#endif
 
 #define YYDEBUG 1
 
@@ -83,7 +91,9 @@ number : integer { printf("int : %d\n", $1); }
 
 %%
 
+#ifndef LEXER_TEST_BUILD
 int main(int argc, char** argv) {
     //yydebug = 1;
     return yyparse();
 }
+#endif

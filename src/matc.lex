@@ -39,3 +39,10 @@ INLINE_COMMENT \/\/.*$
 .                   { printf("Lex : Unknown character %c\n", *yytext); }
 
 %%
+
+#ifdef LEXER_TEST_BUILD
+int main(int argc, char** argv) {
+    while(yylex()) { }
+    return 0;
+}
+#endif

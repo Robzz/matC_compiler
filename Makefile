@@ -37,11 +37,19 @@ make_yacc: $(SRC_DIR)/matc.y
 # Testing targets
 all_tests: test_lex test_yacc
 
+# Lexer test
 test_lex: $(BIN_DIR)/lexer
 
-$(BIN_DIR)/lexer: $(OBJ_DIR)/matc.o
-	$(CC) $< -o $@ $(LDFLAGS)
+$(BIN_DIR)/lexer: $(OBJ_DIR)/matc_test.o $(OBJ_DIR)/y.tab_test.o
+	$(CC) $^ -o $@ $(LDFLAGS)
 
+$(OBJ_DIR)/y.tab_test.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h
+	$(CC) $(CFLAGS) -DLEXER_TEST_BUILD -o $@ $<
+
+$(OBJ_DIR)/matc_test.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h
+	$(CC) $(CFLAGS) -DLEXER_TEST_BUILD -o $@ $<
+
+# Parser test
 test_yacc: $(BIN_DIR)/parser
 
 $(BIN_DIR)/parser: $(OBJ_DIR)/matc.o $(OBJ_DIR)/y.tab.o
