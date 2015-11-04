@@ -26,22 +26,27 @@ STRING_LITERAL \"[^"]*\"
                       float f = strtof(yytext, NULL); 
                       yylval.f = f;
                       return fp; }
-{STRING_LITERAL}          { DBG(printf("Found string literal : %s\n", yytext)); }
+{STRING_LITERAL}          { DBG(printf("Lex : string literal : %s\n", yytext)); }
 {DEC_INT_LITERAL}   { DBG(printf("Lex : integer %s\n", yytext)); yylval.i = atoi(yytext); return integer; }
+const     { DBG(printf("Lex : const\n")); return CONST; }
+if        { DBG(printf("Lex : if\n")); return IF; }
+else      { DBG(printf("Lex : else\n")); return ELSE; }
+while     { DBG(printf("Lex : while\n")); return WHILE; }
+for       { DBG(printf("Lex : for\n")); return FOR; }
 matrix    { DBG(printf("Lex : matrix\n")); return MATRIX; }
-int       { return INT; }
-float     { return FLOAT; }
-void      { return VOID; }
-main      { return MAIN; }
-{IDENT}     { DBG(printf("Lex : identifier : %s\n", yytext)); yylval.s = malloc((yyleng+1)*sizeof(char)); strcpy(yylval.s, yytext); return id; }
-&&          { return AND; }
-\|\|        { return OR; }
-!=          { return NEQ; }
-==          { return EQ; }
-\+\+        { return INCR; }
---          { return DECR; }
-[-+*/~=(){};,.\[\]] { return *yytext; }
-[ \t\n]               ;
-.                   { yyerror("Unknown character\n"); }
+int       { DBG(printf("Lex : int\n")); return INT; }
+float     { DBG(printf("Lex : float\n")); return FLOAT; }
+void      { DBG(printf("Lex : void\n")); return VOID; }
+main      { DBG(printf("Lex : main\n")); return MAIN; }
+{IDENT}   { DBG(printf("Lex : identifier : %s\n", yytext)); yylval.s = malloc((yyleng+1)*sizeof(char)); strcpy(yylval.s, yytext); return id; }
+&&        { DBG(printf("Lex : operator &&\n")); return AND; }
+\|\|      { DBG(printf("Lex : operator ||\n")); return OR; }
+!=        { DBG(printf("Lex : operator !=\n")); return NEQ; }
+==        { DBG(printf("Lex : operator ==\n")); return EQ; }
+\+\+      { DBG(printf("Lex : operator ++\n")); return INCR; }
+--        { DBG(printf("Lex : operator --\n")); return DECR; }
+[-+*/~=(){};,.\[\]] { DBG(printf("Lex : token %c\n", *yytext)); return *yytext; }
+[ \t\n]   ;
+.         { DBG(printf("Lex : unknown token %c\n", *yytext)); yyerror("Unknown character\n"); }
 
 %%

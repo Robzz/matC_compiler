@@ -31,6 +31,11 @@ void yyerror(char* str) {
 %token DECR
 %token AND
 %token OR
+%token CONST
+%token IF
+%token ELSE
+%token WHILE
+%token FOR
 
 %token integer
 %token fp /* float */
@@ -42,17 +47,16 @@ void yyerror(char* str) {
 
 %%
 
-program: INT MAIN '(' ')' '{' function_block '}' { DBG(printf("Found main function\n")); }
+program: INT MAIN '(' ')' '{' function_block '}' { DBG(printf("Yacc : main function\n")); }
 
 type_name: MATRIX
            | INT
            | FLOAT
            | VOID
-           | id { DBG(printf("Identifier : %s\n", $1)); }
 
 /* Literal values */
-number : integer { DBG(printf("int : %d\n", $1)); }
-         | fp { DBG(printf("float : %f\n", $1)); }
+number : integer { DBG(printf("Yacc : int %d\n", $1)); }
+         | fp { DBG(printf("Yacc : float %f\n", $1)); }
 
 number_list: number
            | number_list ',' number
@@ -66,11 +70,11 @@ matrix_value: matrix_line
 matrix_line: '{' number_list '}'
 
 /* */
-function_block: function_block instr { DBG(printf("Got instruction\n")); }
+function_block: function_block instr { DBG(printf("Yacc : instruction\n")); }
                 |
 
-instr: declaration ';' { DBG(printf("Declaration\n")); }
-       | assignment ';' { DBG(printf("Assigment\n")); }
+instr: declaration ';' { DBG(printf("Yacc : declaration\n")); }
+       | assignment ';' { DBG(printf("Yacc : assigment\n")); }
 
 assignment: id '=' value
 
@@ -83,11 +87,11 @@ decl_list: decl_or_init
 decl_or_init: decl_id
               | initialization
 
-decl_id: id { DBG(printf("Declaring variable %s\n", $1)); }
-         | id '[' integer ']' { DBG(printf("Declaring 1D matrix %s (size %d)\n", $1, $3)); }
-         | id '[' integer ']' '[' integer ']' { DBG(printf("Declaring 2D matrix %s (size (%d,%d))\n", $1, $3, $6)); }
+decl_id: id { DBG(printf("Yacc : declaring variable %s\n", $1)); }
+         | id '[' integer ']' { DBG(printf("Yacc : declaring 1D matrix %s (size %d)\n", $1, $3)); }
+         | id '[' integer ']' '[' integer ']' { DBG(printf("Yacc : declaring 2D matrix %s (size (%d,%d))\n", $1, $3, $6)); }
 
-initialization: decl_id '=' value { DBG(printf("Initializing variable\n")); }
+initialization: decl_id '=' value { DBG(printf("Yacc : initializing variable\n")); }
 
 line_list: matrix_line
            | line_list ',' matrix_line
