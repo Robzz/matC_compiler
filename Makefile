@@ -6,8 +6,8 @@ INCLUDE_DIR=include
 SRC_DIR=src
 TARGET=ubercompiler
 
-CFLAGS=-c -Wall -g -I$(INCLUDE_DIR)
-LDFLAGS=-lfl -ly
+CFLAGS+=-c -Wall -g -I$(INCLUDE_DIR)
+LDFLAGS+=-lfl -ly
 
 all: dirs $(BIN_DIR)/$(TARGET)
 
@@ -56,7 +56,7 @@ $(BIN_DIR)/parser: $(OBJ_DIR)/matc.o $(OBJ_DIR)/y.tab.o
 
 # Clean targets
 mrproper: clean
-	rm -rf bin
+	rm -rf bin/*
 
 clean:
 	rm -rf obj/*
@@ -68,7 +68,12 @@ matc_chavignat_laisne.tar.gz: clean $(SRC_DIR) $(INCLUDE_DIR) Makefile
 	tar -acf $@ $^
 
 # Make directories in build tree
-dirs:
-	mkdir -p $(BIN_DIR) $(OBJ_DIR)
+dirs: $(BIN_DIR) $(OBJ_DIR)
+
+$(OBJ_DIR):
+	mkdir -p $@
+
+$(BIN_DIR):
+	mkdir -p $@
 
 .PHONY: make_yacc all dirs clean dist mrproper
