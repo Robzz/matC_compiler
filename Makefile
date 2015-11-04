@@ -16,10 +16,10 @@ $(BIN_DIR)/$(TARGET): $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/matc.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 # Compile C sources
-$(OBJ_DIR)/y.tab.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h
+$(OBJ_DIR)/y.tab.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug.h
 	$(CC) $(CFLAGS) -o $@ $<
 
-$(OBJ_DIR)/matc.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h
+$(OBJ_DIR)/matc.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 # Compilation in debug mode
@@ -42,20 +42,26 @@ all_tests: test_lex test_yacc
 # Lexer test
 test_lex: $(BIN_DIR)/lexer
 
-$(BIN_DIR)/lexer: $(OBJ_DIR)/matc_test.o $(OBJ_DIR)/y.tab_test.o
+$(BIN_DIR)/lexer: $(OBJ_DIR)/matc_test_lex.o $(OBJ_DIR)/y.tab_test_lex.o
 	$(CC) $^ -o $@ $(LDFLAGS)
 
-$(OBJ_DIR)/y.tab_test.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h
+$(OBJ_DIR)/y.tab_test_lex.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug.h
 	$(CC) $(CFLAGS) -DDEBUG -DLEXER_TEST_BUILD -o $@ $<
 
-$(OBJ_DIR)/matc_test.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h
+$(OBJ_DIR)/matc_test_lex.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug.h
 	$(CC) $(CFLAGS) -DDEBUG -DLEXER_TEST_BUILD -o $@ $<
 
 # Parser test
 test_yacc: $(BIN_DIR)/parser
 
-$(BIN_DIR)/parser: $(OBJ_DIR)/matc.o $(OBJ_DIR)/y.tab.o
+$(BIN_DIR)/parser: $(OBJ_DIR)/matc_test_yacc.o $(OBJ_DIR)/y.tab_test_yacc.o
 	$(CC) $^ -o $@ $(LDFLAGS)
+
+$(OBJ_DIR)/y.tab_test_yacc.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug.h
+	$(CC) $(CFLAGS) -DDEBUG -o $@ $<
+
+$(OBJ_DIR)/matc_test_yacc.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug.h
+	$(CC) $(CFLAGS) -DDEBUG -o $@ $<
 
 # Clean targets
 mrproper: clean
