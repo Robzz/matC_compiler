@@ -20,26 +20,9 @@ void yyerror(char* str) {
     char* s;
 }
 
-%token MATRIX
-%token INT
-%token FLOAT
-%token VOID
-%token MAIN
-%token NEQ
-%token EQ
-%token INCR
-%token DECR
-%token AND
-%token OR
-%token CONST
-%token IF
-%token ELSE
-%token WHILE
-%token FOR
-
-%token integer
+%token MATRIX INT FLOAT VOID MAIN NEQ EQ INCR DECR AND OR CONST IF ELSE WHILE FOR
+%token integer id
 %token fp /* float */
-%token id
 
 %type <i> integer;
 %type <f> fp;
