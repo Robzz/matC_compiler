@@ -38,3 +38,6 @@ include/y.tab.h
 src/matc.c
 src/y.tab.c
 src/y.output
+
+#Directory generate by netbeans
+nbproject
