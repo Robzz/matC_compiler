@@ -12,7 +12,7 @@ LDFLAGS+=-lfl -ly
 all: dirs $(BIN_DIR)/$(TARGET)
 
 # Linkage
-$(BIN_DIR)/$(TARGET): $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/matc.o $(OBJ_DIR)/matrix.o
+$(BIN_DIR)/$(TARGET): $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/matc.o $(OBJ_DIR)/matrix.o $(OBJ_DIR)/ast.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 # Compile C sources
@@ -23,6 +23,9 @@ $(OBJ_DIR)/matc.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(OBJ_DIR)/matrix.o: $(SRC_DIR)/matrix.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+$(OBJ_DIR)/ast.o: $(SRC_DIR)/ast.c $(INCLUDE_DIR)/matrix.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 # Compilation in debug mode
