@@ -58,12 +58,13 @@ function_block: function_block instr { DBG(printf("Yacc : instruction\n")); }
 
 instr: call_function ';' { DBG(printf("Yacc : function\n")); }
        | loop '{' function_block '}' { DBG(printf("Yacc : loop\n")); }
+       | condition { DBG(printf("Yacc : conditional\n")); }
        | declaration ';' { DBG(printf("Yacc : declaration\n")); }
        | assignment ';' { DBG(printf("Yacc : assigment\n")); }
        | increment ';' { DBG(printf("Yacc : increment\n")); }
        | decrement ';' { DBG(printf("Yacc : decrement\n")); }
        
-
+/*assignement / increment / decrement */
 assignment: id '=' value { DBG(printf("Yacc : assignement %s = ", $1)); }
 
 increment: INCR id { DBG(printf("Yacc : incr %s\n", $2)); }
@@ -71,6 +72,7 @@ increment: INCR id { DBG(printf("Yacc : incr %s\n", $2)); }
 
 decrement: DECR id { DBG(printf("Yacc : decr %s \n", $2)); }
            | id DECR { DBG(printf("Yacc : %s decr \n", $1)); }
+
 /* Declarations and initializations */
 declaration: type_name decl_list
 
@@ -114,6 +116,10 @@ conditional_op: number EQ number { DBG(printf("Yacc : '==' conditionnal operator
                 | id INF id { DBG(printf("Yacc : '<' conditionnal operator\n")); }
                 | id INFEQ id { DBG(printf("Yacc : '<=' conditionnal operator\n")); }
                 | id SUPEQ id { DBG(printf("Yacc : '>=' conditionnal operator\n")); }
+
+/*condition declaration*/
+condition: IF '('conditional_op ')' '{' function_block '}'
+           | IF '('conditional_op ')' '{' function_block '}' ELSE '{' function_block '}'
 
 /*function declaration*/
 call_function: id '(' parameters ')' { DBG(printf("Yacc : function %s \n", $1)); }
