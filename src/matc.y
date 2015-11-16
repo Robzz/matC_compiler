@@ -28,6 +28,7 @@ void yyerror(char* str) {
 %type <f> fp;
 %type <s> id;
 
+%left '[' ']'
 %left '*' '/'
 %left '+' '-'
 %left '%'
@@ -63,6 +64,15 @@ matrix_value: matrix_line
 
 matrix_line: '{' number_list '}'
 
+matrix_extraction: expr '[' interval_list ']' { printf("Yacc : matrix extraction\n"); }
+
+interval_list: interval_list ';' interval
+               | interval
+
+interval: '*'
+          | integer
+          | integer '.' '.' integer
+
 /* */
 block: block instr { DBG(printf("Yacc : instruction\n")); }
                 |
@@ -71,10 +81,13 @@ instr: loop '{' block '}' { DBG(printf("Yacc : loop\n")); }
        | condition { DBG(printf("Yacc : conditional\n")); }
        | declaration ';' { DBG(printf("Yacc : declaration\n")); }
        | assignment ';' { DBG(printf("Yacc : assigment\n")); }
+       | matrix_element_assignment ';' { DBG(printf("Yacc : matrix element assigment\n")); }
        | expr ';'
        
 /* assignement */
 assignment: id '=' expr { DBG(printf("Yacc : assignement %s\n", $1)); }
+
+matrix_element_assignment: matrix_extraction '=' expr
 
 /* Declarations and initializations */
 declaration: type_name decl_list
@@ -99,6 +112,7 @@ expr: STRING
       | '(' expr ')'
       | id
       | value
+      | matrix_extraction
       | function_call
       | arithmetic_expr
       | boolean_expr
