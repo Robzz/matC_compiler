@@ -28,6 +28,7 @@ STRING_LITERAL \"[^"]*\"
                       return fp; }
 {STRING_LITERAL}          { DBG(printf("Lex : string literal : %s\n", yytext)); return STRING; }
 {DEC_INT_LITERAL}   { DBG(printf("Lex : integer %s\n", yytext)); yylval.i = atoi(yytext); return integer; }
+return    { DBG(printf("Lex : return\n")); return RETURN; }
 const     { DBG(printf("Lex : const\n")); return CONST; }
 if        { DBG(printf("Lex : if\n")); return IF; }
 else      { DBG(printf("Lex : else\n")); return ELSE; }
@@ -37,7 +38,6 @@ matrix    { DBG(printf("Lex : matrix\n")); return MATRIX; }
 int       { DBG(printf("Lex : int\n")); return INT; }
 float     { DBG(printf("Lex : float\n")); return FLOAT; }
 void      { DBG(printf("Lex : void\n")); return VOID; }
-main      { DBG(printf("Lex : main\n")); return MAIN; }
 {IDENT}   { DBG(printf("Lex : identifier : %s\n", yytext)); yylval.s = malloc((yyleng+1)*sizeof(char)); strcpy(yylval.s, yytext); return id; }
 &&        { DBG(printf("Lex : operator &&\n")); return AND; }
 \|\|      { DBG(printf("Lex : operator ||\n")); return OR; }
