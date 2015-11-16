@@ -166,7 +166,9 @@ loop_while: WHILE '(' expr ')' { DBG(printf("Yacc : WHILE loop \n")); }
 
 #ifndef LEXER_TEST_BUILD
 int main(int argc, char** argv) {
+#ifdef DENBUG
     yydebug = 0;
+#endif
     return yyparse();
 }
 #endif
