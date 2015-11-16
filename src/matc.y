@@ -74,7 +74,7 @@ instr: loop '{' block '}' { DBG(printf("Yacc : loop\n")); }
        | expr ';'
        
 /* assignement */
-assignment: id '=' value { DBG(printf("Yacc : assignement %s\n", $1)); }
+assignment: id '=' expr { DBG(printf("Yacc : assignement %s\n", $1)); }
 
 /* Declarations and initializations */
 declaration: type_name decl_list
@@ -89,7 +89,7 @@ decl_id: id { DBG(printf("Yacc : declaring variable %s\n", $1)); }
          | id '[' integer ']' { DBG(printf("Yacc : declaring 1D matrix %s (size %d)\n", $1, $3)); }
          | id '[' integer ']' '[' integer ']' { DBG(printf("Yacc : declaring 2D matrix %s (size (%d,%d))\n", $1, $3, $6)); }
 
-initialization: decl_id '=' value { DBG(printf("Yacc : initializing variable\n")); }
+initialization: decl_id '=' expr { DBG(printf("Yacc : initializing variable\n")); }
 
 line_list: matrix_line
            | line_list ',' matrix_line
@@ -152,7 +152,7 @@ loop_while: WHILE '(' expr ')' { DBG(printf("Yacc : WHILE loop \n")); }
 
 #ifndef LEXER_TEST_BUILD
 int main(int argc, char** argv) {
-    //yydebug = 1;
+    yydebug = 0;
     return yyparse();
 }
 #endif

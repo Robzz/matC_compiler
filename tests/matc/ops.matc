@@ -4,6 +4,4 @@ int main() {
     int c = a + b;
     int d = a - b / c;
     int e = (a - b) / c;
-
-    return 0;
 }
