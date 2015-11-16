@@ -26,8 +26,9 @@ STRING_LITERAL \"[^"]*\"
                       float f = strtof(yytext, NULL); 
                       yylval.f = f;
                       return fp; }
-{STRING_LITERAL}          { DBG(printf("Lex : string literal : %s\n", yytext)); }
+{STRING_LITERAL}          { DBG(printf("Lex : string literal : %s\n", yytext)); return STRING; }
 {DEC_INT_LITERAL}   { DBG(printf("Lex : integer %s\n", yytext)); yylval.i = atoi(yytext); return integer; }
+return    { DBG(printf("Lex : return\n")); return RETURN; }
 const     { DBG(printf("Lex : const\n")); return CONST; }
 if        { DBG(printf("Lex : if\n")); return IF; }
 else      { DBG(printf("Lex : else\n")); return ELSE; }
@@ -37,12 +38,15 @@ matrix    { DBG(printf("Lex : matrix\n")); return MATRIX; }
 int       { DBG(printf("Lex : int\n")); return INT; }
 float     { DBG(printf("Lex : float\n")); return FLOAT; }
 void      { DBG(printf("Lex : void\n")); return VOID; }
-main      { DBG(printf("Lex : main\n")); return MAIN; }
 {IDENT}   { DBG(printf("Lex : identifier : %s\n", yytext)); yylval.s = malloc((yyleng+1)*sizeof(char)); strcpy(yylval.s, yytext); return id; }
 &&        { DBG(printf("Lex : operator &&\n")); return AND; }
 \|\|      { DBG(printf("Lex : operator ||\n")); return OR; }
 !=        { DBG(printf("Lex : operator !=\n")); return NEQ; }
 ==        { DBG(printf("Lex : operator ==\n")); return EQ; }
+\>        { DBG(printf("Lex : operator >\n")); return SUP; }
+\<        { DBG(printf("Lex : operator <\n")); return INF; }
+\<=        { DBG(printf("Lex : operator <=\n")); return INFEQ; }
+\>=        { DBG(printf("Lex : operator >=\n")); return SUPEQ; }
 \+\+      { DBG(printf("Lex : operator ++\n")); return INCR; }
 --        { DBG(printf("Lex : operator --\n")); return DECR; }
 [-+*/~=(){};,.\[\]] { DBG(printf("Lex : token %c\n", *yytext)); return *yytext; }

@@ -22,5 +22,4 @@ int main() {
     printf("est X= ");
     printmat(X);
     printf("\n");
-    return 0;
 }
