@@ -23,20 +23,10 @@ listQuad newQuadList() {
 
 listQuad addQuadTailList(listQuad quads, aQuad newquad);
 
-/*
- * add new quad to a list
- */
 listQuad addQuadHeadList(listQuad quads, aQuad newquad);
 
-/*
- * add new quad to a list before the position "pos"
- * exemple : pos=3, our quad becore number 3 and the old number 3 become 4
- */
 listQuad addQuadPosList(listQuad quads, aQuad newquad, int pos);
 
-/*
- * return quad at the position pos
- */
 aQuad getQuadPos(listQuad quads, aQuad newquad, int pos);
 
 void destroyHeadList(listQuad quads) {
