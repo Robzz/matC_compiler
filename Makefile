@@ -12,7 +12,7 @@ LDFLAGS+=-lfl -ly
 all: dirs $(BIN_DIR)/$(TARGET)
 
 # Linkage
-$(BIN_DIR)/$(TARGET): $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/matc.o $(OBJ_DIR)/matrix.o $(OBJ_DIR)/types.o $(OBJ_DIR)/symbol_table.o
+$(BIN_DIR)/$(TARGET): $(OBJ_DIR)/y.tab.o $(OBJ_DIR)/matc.o $(OBJ_DIR)/matrix.o $(OBJ_DIR)/types.o $(OBJ_DIR)/symbol_table.o $(OBJ_DIR)/quad.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 # Compile C sources
@@ -29,6 +29,9 @@ $(OBJ_DIR)/types.o: $(SRC_DIR)/types.c $(INCLUDE_DIR)/types.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(OBJ_DIR)/symbol_table.o: $(SRC_DIR)/symbol_table.c $(INCLUDE_DIR)/symbol_table.h $(INCLUDE_DIR)/types.h
+	$(CC) $(CFLAGS) -o $@ $<
+
+$(OBJ_DIR)/quad.o: $(SRC_DIR)/quad.c $(INCLUDE_DIR)/quad.h $(INCLUDE_DIR)/symbol_table.h
 	$(CC) $(CFLAGS) -o $@ $<
 
 # Compilation in debug mode

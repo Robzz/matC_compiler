@@ -7,13 +7,13 @@ typedef struct {
     char* ident; 
     Type t;
     unsigned int id;
-} TableRecord;
+} * TableRecord;
 
 typedef struct {
     unsigned int size;
     unsigned int capacity;
     Type* table;
-} SymbolTable;
+} * SymbolTable;
 
 
 /* Look for a symbol in the table.

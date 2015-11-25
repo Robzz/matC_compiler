@@ -2,29 +2,30 @@
  * File:   quad.h
  * Author: dragorane
  *
- * struct for quad operation
+ * struct for quad
  */
 #ifndef QUAD_H
 #define QUAD_H
+#include "symbol_table.h"
 
 typedef struct quad{
-    int id;
+    int label;
     char op;
-    SymbolTable* arg1;
-    SymbolTable* arg2;
-    SymbolTable* res;
+    SymbolTable arg1;
+    SymbolTable arg2;
+    SymbolTable res;
     struct quad* next;
-}aQuad;
+} * aQuad;
 
 typedef struct quad_list{
     aQuad head;
     int number;
-}listQuad;
+} * listQuad;
 
 /*
  * Generate a new quad
  */
-aQuad newQuad(SymbolTable* arg1, SymbolTable* arg2, char op, SymbolTable* res);
+aQuad newQuad(SymbolTable arg1, SymbolTable arg2, char op, SymbolTable res);
 
 /*
  * Create a new quad List
@@ -42,15 +43,15 @@ listQuad addQuadTailList(listQuad quads, aQuad newquad);
 listQuad addQuadHeadList(listQuad quads, aQuad newquad);
 
 /*
- * add new quad to a list before the position "pos"
+ * add new quad to a list before the label "lab"
  * exemple : pos=3, our quad becore number 3 and the old number 3 become 4
  */
-listQuad addQuadPosList(listQuad quads, aQuad newquad, int pos);
+listQuad addQuadPosList(listQuad quads, aQuad newquad, int lab);
 
 /*
- * return quad at the position pos
+ * return quad with label; NULL if not exist
  */
-aQuad getQuadPos(listQuad quads, aQuad newquad, int pos);
+aQuad getQuadLab(listQuad quads, aQuad newquad, int lab);
 /*
  * print quad list
  */
