@@ -39,6 +39,9 @@ src/matc.c
 src/y.tab.c
 src/y.output
 .ycm_extra_conf.*
+tests/unit/symtable
+tests/unit/types
+.vimrc
 
 #Directory generate by netbeans
 nbproject

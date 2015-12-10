@@ -34,6 +34,9 @@ $(OBJ_DIR)/symbol_table.o: $(SRC_DIR)/symbol_table.c $(INCLUDE_DIR)/symbol_table
 $(OBJ_DIR)/quad.o: $(SRC_DIR)/quad.c $(INCLUDE_DIR)/quad.h $(INCLUDE_DIR)/symbol_table.h
 	$(CC) $(CFLAGS) -o $@ $<
 
+$(OBJ_DIR)/ast.o: $(SRC_DIR)/ast.c $(INCLUDE_DIR)/matrix.h
+	$(CC) $(CFLAGS) -o $@ $<
+
 # Compilation in debug mode
 
 
@@ -75,6 +78,10 @@ $(OBJ_DIR)/y.tab_test_yacc.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h $(INCLUD
 $(OBJ_DIR)/matc_test_yacc.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug.h
 	$(CC) $(CFLAGS) -DDEBUG -o $@ $<
 
+# Unit tests
+unit:
+	$(MAKE) -C tests/unit
+
 # Clean targets
 mrproper: clean
 	rm -rf bin/*
@@ -97,4 +104,4 @@ $(OBJ_DIR):
 $(BIN_DIR):
 	mkdir -p $@
 
-.PHONY: make_yacc all dirs clean dist mrproper
+.PHONY: make_yacc all dirs clean dist mrproper unit
