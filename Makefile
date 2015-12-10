@@ -5,6 +5,7 @@ OBJ_DIR=obj
 INCLUDE_DIR=include
 SRC_DIR=src
 TARGET=ubercompiler
+MAKE=make
 
 CFLAGS+=-c -Wall -g -I$(INCLUDE_DIR)
 LDFLAGS+=-lfl -ly
@@ -75,6 +76,10 @@ $(OBJ_DIR)/y.tab_test_yacc.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h $(INCLUD
 $(OBJ_DIR)/matc_test_yacc.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug.h
 	$(CC) $(CFLAGS) -DDEBUG -o $@ $<
 
+# Unit tests
+unit:
+	$(MAKE) -C tests/unit
+
 # Clean targets
 mrproper: clean
 	rm -rf bin/*
@@ -97,4 +102,4 @@ $(OBJ_DIR):
 $(BIN_DIR):
 	mkdir -p $@
 
-.PHONY: make_yacc all dirs clean dist mrproper
+.PHONY: make_yacc all dirs clean dist mrproper unit
