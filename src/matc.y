@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "debug.h"
+#include "symbol_table.h"
+
+SymbolTable* symtable;
+TypeFamily lasttype;
 
 int yylex();
 
@@ -20,7 +24,7 @@ void yyerror(char* str) {
     char* s;
 }
 
-%token MATRIX INT FLOAT VOID NEQ EQ INCR DECR AND OR CONST IF ELSE WHILE FOR SUP INF SUPEQ INFEQ STRING RETURN
+%token MATRIX_TKN INT_TKN FLOAT_TKN VOID NEQ EQ INCR DECR AND OR CONST IF ELSE WHILE FOR SUP INF SUPEQ INFEQ STRING RETURN
 %token integer id 
 %token fp /* float */
 
@@ -43,9 +47,9 @@ program: instr_list
 instr_list: instr_list instr
            | instr
 
-type_name: MATRIX
-           | INT
-           | FLOAT
+type_name: MATRIX_TKN
+           | INT_TKN
+           | FLOAT_TKN
            | VOID
 
 statement: primary_statement ';'
@@ -114,9 +118,12 @@ decl_list: decl_or_init
 decl_or_init: decl_id
               | initialization
 
-decl_id: id { DBG(printf("Yacc : declaring variable %s\n", $1)); }
-         | id '[' integer ']' { DBG(printf("Yacc : declaring 1D matrix %s (size %d)\n", $1, $3)); }
-         | id '[' integer ']' '[' integer ']' { DBG(printf("Yacc : declaring 2D matrix %s (size (%d,%d))\n", $1, $3, $6)); }
+decl_id: id { DBG(printf("Yacc : declaring variable %s\n", $1));
+              add_symbol(symtable, new_record($1, new_type(FLOAT))); } /* TODO : this is SHIT. Not the real type */
+         | id '[' integer ']' { DBG(printf("Yacc : declaring 1D matrix %s (size %d)\n", $1, $3));
+                                add_symbol(symtable, new_record($1, new_matrix_type(1, $3))); }
+         | id '[' integer ']' '[' integer ']' { DBG(printf("Yacc : declaring 2D matrix %s (size (%d,%d))\n", $1, $3, $6));
+                                                add_symbol(symtable, new_record($1, new_matrix_type($3, $6))); }
 
 initialization: decl_id '=' expr { DBG(printf("Yacc : initializing variable\n")); }
 
@@ -185,6 +192,10 @@ int main(int argc, char** argv) {
 #ifdef DEBUG
     yydebug = 1;
 #endif
-    return yyparse();
+    symtable = new_symbol_table();
+    int r = yyparse();
+    print_symbol_table(symtable);
+    delete_symbol_table(symtable);
+    return r;
 }
 #endif

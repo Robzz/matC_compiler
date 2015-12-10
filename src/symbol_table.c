@@ -27,7 +27,7 @@ RecordList* new_record_list() {
 }
 
 void delete_record_list(RecordList* l) {
-    for(RecordList* it = l; it || it->rec ; it = it->next)
+    for(RecordList* it = l; it && it->rec ; it = it->next)
         free(it->rec);
 }
 

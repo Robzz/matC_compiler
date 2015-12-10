@@ -34,9 +34,9 @@ if        { DBG(printf("Lex : if\n")); return IF; }
 else      { DBG(printf("Lex : else\n")); return ELSE; }
 while     { DBG(printf("Lex : while\n")); return WHILE; }
 for       { DBG(printf("Lex : for\n")); return FOR; }
-matrix    { DBG(printf("Lex : matrix\n")); return MATRIX; }
-int       { DBG(printf("Lex : int\n")); return INT; }
-float     { DBG(printf("Lex : float\n")); return FLOAT; }
+matrix    { DBG(printf("Lex : matrix\n")); return MATRIX_TKN; }
+int       { DBG(printf("Lex : int\n")); return INT_TKN; }
+float     { DBG(printf("Lex : float\n")); return FLOAT_TKN; }
 void      { DBG(printf("Lex : void\n")); return VOID; }
 {IDENT}   { DBG(printf("Lex : identifier : %s\n", yytext)); yylval.s = malloc((yyleng+1)*sizeof(char)); strcpy(yylval.s, yytext); return id; }
 &&        { DBG(printf("Lex : operator &&\n")); return AND; }

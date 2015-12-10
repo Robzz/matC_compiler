@@ -16,5 +16,7 @@ int main(int argc, char** argv) {
 
     print_symbol_table(s);
 
+    delete_symbol_table(s);
+
     return 0;
 }

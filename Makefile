@@ -69,7 +69,7 @@ $(OBJ_DIR)/matc_test_lex.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_D
 # Parser test
 test_yacc: $(BIN_DIR)/parser
 
-$(BIN_DIR)/parser: $(OBJ_DIR)/matc_test_yacc.o $(OBJ_DIR)/y.tab_test_yacc.o
+$(BIN_DIR)/parser: $(OBJ_DIR)/matc_test_yacc.o $(OBJ_DIR)/y.tab_test_yacc.o $(OBJ_DIR)/symbol_table.o $(OBJ_DIR)/types.o
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_DIR)/y.tab_test_yacc.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug.h
