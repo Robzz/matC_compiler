@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -Wall -I../../include
+CFLAGS=-g --std=c11 -Wall -I../../include
 OBJ_DIR=../../obj
 
 all: types symtable

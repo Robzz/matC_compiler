@@ -6,7 +6,7 @@ INCLUDE_DIR=include
 SRC_DIR=src
 TARGET=ubercompiler
 
-CFLAGS+=-c -Wall -g -I$(INCLUDE_DIR)
+CFLAGS+=-c -Wall --std=c11 -g -I$(INCLUDE_DIR)
 LDFLAGS+=-lfl -ly
 
 all: dirs $(BIN_DIR)/$(TARGET)
