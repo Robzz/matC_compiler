@@ -16,7 +16,8 @@ TableRecord* new_record(char* ident, Type* t) {
 
 void delete_record(TableRecord* rec) {
     free(rec->ident);
-    
+    delete_type(rec->t);
+    free(rec);
 }
 
 RecordList* new_record_list() {
@@ -27,12 +28,22 @@ RecordList* new_record_list() {
 }
 
 void delete_record_list(RecordList* l) {
-    for(RecordList* it = l; it && it->rec ; it = it->next)
-        free(it->rec);
+    RecordList* it = l;
+    while(it) {
+        if(it->rec)
+            delete_record(it->rec);
+        RecordList* t = it;
+        it = it->next;
+        free(t);
+    }
 }
 
 void list_add_record(RecordList* l, TableRecord* rec) {
     RecordList* it = l;
+    if(!it->rec) {
+        it->rec = rec;
+        return;
+    }
     for(; it->next; it = it->next);
     it->next = new_record_list();
     it->next->rec = rec;
@@ -73,6 +84,21 @@ void add_symbol(SymbolTable* s, TableRecord* tr) {
     if(!list_search_record(l, tr->ident)) {
         list_add_record(l, tr);
     }
+}
+
+bool lookup_symbol(SymbolTable* s, char* ident, TableRecord** ptr) {
+    unsigned int h = hash_str(ident);
+    unsigned int i = h % N_BUCKETS;
+
+    TableRecord* rec = list_search_record(s->buckets[i], ident);
+    if(rec) {
+        if(ptr)
+            *ptr = rec;
+        return true;
+    }
+    if(ptr)
+        *ptr = NULL;
+    return false;
 }
 
 /* Jenkins one-at-a-time hash function */
