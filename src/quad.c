@@ -22,11 +22,15 @@ listQuad newQuadList() {
 
 listQuad addQuadTailList(listQuad quads, aQuad newquad) {
     aQuad tmp = quads->head;
-    while (tmp->next != NULL) {
-        tmp = tmp->next;
+    if (tmp == NULL) {
+        quads->head = newquad;
+    } else {
+        while (tmp->next != NULL) {
+            tmp = tmp->next;
+        }
+        tmp->next = newquad;
+        newquad->next = NULL;
     }
-    tmp->next = newquad;
-    newquad->next = NULL;
     return quads;
 }
 
@@ -62,9 +66,11 @@ aQuad getQuadLab(listQuad quads, aQuad newquad, int lab) {
 }
 
 void destroyHeadList(listQuad quads) {
-    aQuad tmp = quads->head->next;
-    destroyQuad(quads->head);
-    quads->head = tmp;
+    if (quads->head != NULL) {
+        aQuad tmp = quads->head->next;
+        destroyQuad(quads->head);
+        quads->head = tmp;
+    }
 }
 
 void destroyList(listQuad quads) {
@@ -85,7 +91,7 @@ void destroyQuad(aQuad quad) {
 void printList(listQuad quads) {
     printf("List of quad :\n");
     aQuad tmp = quads->head;
-    while (tmp->next != NULL) {
+    while (tmp != NULL) {
         printQuad(tmp);
         tmp = tmp->next;
     }
@@ -95,12 +101,17 @@ void printList(listQuad quads) {
  * print a quad 
  */
 void printQuad(aQuad quad) {
-    printf("label : %d\n", quad->label);
-    printf("%s : ", quad->arg1->ident);
-    print_type(quad->arg1->t);
-    printf("\n");
-    print_symbol_table(quad->arg1);
-    print_symbol_table(quad->arg2);
-    printf("op : %c\n", quad->op);
-    print_symbol_table(quad->res);
+    if (quad != NULL) {
+        printf("label : %d\n", quad->label);
+        printf("%s : ", quad->arg1->ident);
+        print_type(quad->arg1->t);
+        printf("\n");
+        printf("%s : ", quad->arg2->ident);
+        print_type(quad->arg2->t);
+        printf("\n");
+        printf("op : %c\n", quad->op);
+        printf("%s : ", quad->res->ident);
+        print_type(quad->res->t);
+        printf("\n");
+    }
 }

@@ -25,7 +25,7 @@ typedef struct quad_list {
 /*
  * Generate a new quad
  */
-aQuad newQuad(SymbolTable * arg1, SymbolTable * arg2, char op, SymbolTable * res);
+aQuad newQuad(TableRecord * arg1, TableRecord * arg2, char op, TableRecord * res);
 
 /*
  * Create a new quad List

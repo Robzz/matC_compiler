@@ -14,11 +14,27 @@ int main(int argc, char** argv) {
 
     print_symbol_table(s);
     listQuad list = newQuadList();
-    TableRecord* rec1 = list_search_record(s->buckets[0], "il");
-    TableRecord* rec2 = list_search_record(s->buckets[1], "f1");
-    TableRecord* rec3 = list_search_record(s->buckets[2], "al");
-    aQuad new = newQuad(rec1, rec2, '=', rec3);
-    list = addQuadHeadList(list, new);
+    TableRecord * rec1 = NULL;
+    TableRecord * rec2 = NULL;
+    TableRecord * rec3 = NULL;
+    aQuad new = NULL;
+    printf("init:");
+    if (lookup_symbol(s, "il", &rec1) == true) {
+        printf("1");
+        if (lookup_symbol(s, "f1", &rec2) == true) {
+            printf("2");
+            if (lookup_symbol(s, "al", &rec3) == true) {
+                printf("3");
+                new = newQuad(rec1, rec2, '=', rec3);
+                printQuad(new);
+            }
+        }
+
+    }
+    if (new != NULL) {
+        list = addQuadHeadList(list, new);
+        printList(list);
+    }
     destroyHeadList(list);
     delete_symbol_table(s);
 
