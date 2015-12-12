@@ -73,7 +73,7 @@ if [[ $TEST_UNIT != 0 ]]; then
         echo 'Error : cannot build unit tests'
         exit 1
     fi
-    for f in tests/unit/{types,symtable} ; do
+    for f in tests/unit/*(x); do
         if ./$f 1&> /dev/null; then
             echo -e 'Unit test '"$f"': \e[32mSUCCESS\e[0m'
         else
