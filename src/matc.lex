@@ -64,7 +64,8 @@ void      { DBG(printf("Lex : void\n")); return VOID; }
 ")"       { DBG(printf("Lex : ) \n")); return CLPAR; }
 "{"       { DBG(printf("Lex : { \n")); return OPBRACKET; }
 "}"       { DBG(printf("Lex : } \n")); return CLBRACKET; }
-[=(){};,.\[\]] { DBG(printf("Lex : token %c\n", *yytext)); return *yytext; }
+"="       { DBG(printf("Lex : } \n")); return AFFECT; }
+[(){};,.\[\]] { DBG(printf("Lex : token %c\n", *yytext)); return *yytext; }
 [ \t\n]   ;
 .         { DBG(printf("Lex : unknown token %c\n", *yytext)); yyerror("Unknown character\n"); }
 

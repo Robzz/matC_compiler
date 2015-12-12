@@ -9,6 +9,7 @@
 SymbolTable* symtable;
 TypeFamily lasttype;
 RecordList* new_symbols;
+listQuad list;
 
 int yylex();
 void lex_free();
@@ -35,7 +36,7 @@ TypeFamily typename_to_typefamily(int token);
 }
  
 %token <codegen> MATRIX_TKN INT_TKN FLOAT_TKN VOID NEQ EQ INCR DECR AND OR CONST OPPAR CLPAR OPBRACKET CLBRACKET
-%token <codegen> IF ELSE WHILE FOR SUP INF SUPEQ INFEQ STRING RETURN MINUS PLUS MULT DIV TILDE MOD
+%token <codegen> IF ELSE WHILE FOR SUP INF SUPEQ INFEQ STRING RETURN MINUS PLUS MULT DIV TILDE MOD AFFECT
 %token <i> integer 
 %token <s> id 
 %token <f> fp
@@ -45,10 +46,10 @@ TypeFamily typename_to_typefamily(int token);
 %type <codegen> matrix_value matrix_line line_list arithmetic_expr
 
 %left '[' ']'
-%left '*' '/'
-%left '+' '-'
-%left '%'
-%left UNARY '~' '!'
+%left MULT DIV
+%left PLUS MINUS
+%left MOD
+%left UNARY TILDE '!'
 %left EQ NEQ SUPEQ INFEQ '<' '>'
 %left OR AND
 
@@ -118,9 +119,9 @@ fn_decl_param_list:
                     | type_name id
 
 /* assignement */
-assignment: id '=' expr { DBG(printf("Yacc : assignement %s\n", $1)); }
+assignment: id AFFECT expr { DBG(printf("Yacc : assignement %s\n", $1)); }
 
-matrix_element_assignment: matrix_extraction '=' expr
+matrix_element_assignment: matrix_extraction AFFECT expr
 
 /* Declarations and initializations */
 declaration: type_name decl_list { 
@@ -157,7 +158,7 @@ decl_id: id { DBG(printf("Yacc : declaring variable %s\n", $1));
                                                 // add_symbol(symtable, new_record($1, new_matrix_type($3, $6)));
                                                 list_add_record(new_symbols, new_record($1, new_matrix_type($3, $6))); }
 
-initialization: decl_id '=' expr { DBG(printf("Yacc : initializing variable\n")); }
+initialization: decl_id AFFECT expr { DBG(printf("Yacc : initializing variable\n")); }
 
 line_list: matrix_line
            | line_list ',' matrix_line
@@ -181,14 +182,23 @@ decrement: DECR id { DBG(printf("Yacc : decr %s \n", $2)); }
            | id DECR { DBG(printf("Yacc : %s decr \n", $1)); }
 
 arithmetic_expr: expr PLUS expr 
-//                                {  TableRecord * rec1;
+                                    //{$$.result=temp symbol
+//                                  if($1.result->t == $3.result->t){
+//                                      if($1.result->t->tf == INT){
+//                                      }
+//                                      if($1.result->t->tf == FLOAT){
+//                                      }
+//                                  }
+
+//                                  TableRecord * rec1;
 //                                  TableRecord * rec2;
 //                                  if (lookup_symbol(s, $1, &rec1) == true) {
 //                                    if (lookup_symbol(s, $2, &rec2) == true) {
 //                                        aQuad new = newQuad(rec1, rec2, OP_PLUS, null);
 //                                        list = addQuadTailList(list, new);
 //                                    }
-//                                  }}
+//                                  }
+//                                }
                  | expr MINUS expr 
                  | expr MULT expr
                  | expr DIV expr
@@ -240,7 +250,7 @@ int main(int argc, char** argv) {
 #endif
     symtable = new_symbol_table();
     new_symbols = new_record_list();
-    listQuad list = newQuadList();
+    list = newQuadList();
     int r = yyparse();
     printf("content symbol table : \n");
     print_symbol_table(symtable);

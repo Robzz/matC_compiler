@@ -9,6 +9,10 @@ typedef struct {
     char* ident; 
     Type* t;
     unsigned int id;
+    union {
+        int int_v;
+        float float_v;
+    } value;
 } TableRecord;
 
 TableRecord* new_record(char* ident, Type* t);
