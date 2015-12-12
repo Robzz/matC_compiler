@@ -21,11 +21,11 @@ int main(int argc, char** argv) {
     TableRecord * rec3;
     aQuad new = NULL;
     printf("init:");
-    if (lookup_symbol(s, "il", &rec1) == true) {
+    if (lookup_symbol(s, "i1", &rec1) == true) {
         printf("1");
         if (lookup_symbol(s, "f1", &rec2) == true) {
             printf("2");
-            if (lookup_symbol(s, "al", &rec3) == true) {
+            if (lookup_symbol(s, "a1", &rec3) == true) {
                 printf("3");
                 new = newQuad(rec1, rec2, '=', rec3);
                 printQuad(new);

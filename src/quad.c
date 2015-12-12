@@ -31,12 +31,14 @@ listQuad addQuadTailList(listQuad quads, aQuad newquad) {
         tmp->next = newquad;
         newquad->next = NULL;
     }
+    quads->number = quads->number + 1;
     return quads;
 }
 
 listQuad addQuadHeadList(listQuad quads, aQuad newquad) {
     newquad->next = quads->head;
     quads->head = newquad;
+    quads->number = quads->number + 1;
     return quads;
 }
 
