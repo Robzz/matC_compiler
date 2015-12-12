@@ -2,10 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "debug.h"
+#include "types.h"
+
 #include "symbol_table.h"
 
 SymbolTable* symtable;
 TypeFamily lasttype;
+RecordList* new_symbols;
 
 int yylex();
 
@@ -16,12 +19,15 @@ void yyerror(char* str) {
 #endif
 }
 
+TypeFamily typename_to_typefamily(int token);
+
 %}
 
 %union {
     int i;
     float f;
     char* s;
+    TableRecord* t;
 }
 
 %token MATRIX_TKN INT_TKN FLOAT_TKN VOID NEQ EQ INCR DECR AND OR CONST IF ELSE WHILE FOR SUP INF SUPEQ INFEQ STRING RETURN
@@ -29,6 +35,7 @@ void yyerror(char* str) {
 %token fp /* float */
 
 %type <i> integer;
+%type <i> type_name;
 %type <f> fp;
 %type <s> id;
 
@@ -47,10 +54,10 @@ program: instr_list
 instr_list: instr_list instr
            | instr
 
-type_name: MATRIX_TKN
-           | INT_TKN
-           | FLOAT_TKN
-           | VOID
+type_name: MATRIX_TKN { $$ = MATRIX_TKN; }
+           | INT_TKN { $$ = INT_TKN; }
+           | FLOAT_TKN { $$ = FLOAT_TKN; }
+           | VOID { $$ = 42; }
 
 statement: primary_statement ';'
            | loop { DBG(printf("Yacc : loop statement\n")); }
@@ -110,7 +117,23 @@ assignment: id '=' expr { DBG(printf("Yacc : assignement %s\n", $1)); }
 matrix_element_assignment: matrix_extraction '=' expr
 
 /* Declarations and initializations */
-declaration: type_name decl_list
+declaration: type_name decl_list { 
+    for(RecordList* it = new_symbols ; it != NULL ; it = it->next) {
+        TypeFamily tf = typename_to_typefamily($1);
+        if(tf != MATRIX && tf != FLOAT) {
+            Type* t = it->rec->t;
+            while(t->arr_info) {
+                t = t->arr_info->elem_t;
+            }
+            t->tf = tf;
+        }
+        add_symbol(symtable, it->rec);
+    }
+
+    // "Clear" the list
+    new_symbols->rec = NULL;
+    new_symbols->next = NULL;
+}
 
 decl_list: decl_or_init
            | decl_list ',' decl_or_init
@@ -119,11 +142,14 @@ decl_or_init: decl_id
               | initialization
 
 decl_id: id { DBG(printf("Yacc : declaring variable %s\n", $1));
-              add_symbol(symtable, new_record($1, new_type(FLOAT))); } /* TODO : this is SHIT. Not the real type */
+              // add_symbol(symtable, new_type(FLOAT)));
+              list_add_record(new_symbols, new_record($1, new_type(FLOAT))); } /* TODO : this is SHIT. Not the real type */
          | id '[' integer ']' { DBG(printf("Yacc : declaring 1D matrix %s (size %d)\n", $1, $3));
-                                add_symbol(symtable, new_record($1, new_matrix_type(1, $3))); }
+                                // add_symbol(symtable, new_record($1, new_matrix_type(1, $3))); 
+                                list_add_record(new_symbols, new_record($1, new_matrix_type(1, $3))); }
          | id '[' integer ']' '[' integer ']' { DBG(printf("Yacc : declaring 2D matrix %s (size (%d,%d))\n", $1, $3, $6));
-                                                add_symbol(symtable, new_record($1, new_matrix_type($3, $6))); }
+                                                // add_symbol(symtable, new_record($1, new_matrix_type($3, $6)));
+                                                list_add_record(new_symbols, new_record($1, new_matrix_type($3, $6))); }
 
 initialization: decl_id '=' expr { DBG(printf("Yacc : initializing variable\n")); }
 
@@ -134,7 +160,7 @@ line_list: matrix_line
 expr: STRING
       | '(' expr ')'
       | id
-      | value
+      | value { }
       | matrix_extraction
       | function_call
       | arithmetic_expr
@@ -187,12 +213,20 @@ loop_for: FOR '(' primary_statement ';' expr ';' primary_statement ')' { DBG(pri
 loop_while: WHILE '(' expr ')' { DBG(printf("Yacc : WHILE loop \n")); }
 %%
 
+TypeFamily typename_to_typefamily(int token) {
+    return token == MATRIX_TKN ? MATRIX :
+           token == INT_TKN ?    INT :
+           token == FLOAT_TKN ?  FLOAT :
+                                 UNREACHABLE();
+}
+
 #ifndef LEXER_TEST_BUILD
 int main(int argc, char** argv) {
 #ifdef DEBUG
     yydebug = 1;
 #endif
     symtable = new_symbol_table();
+    new_symbols = new_record_list();
     int r = yyparse();
     print_symbol_table(symtable);
     delete_symbol_table(symtable);

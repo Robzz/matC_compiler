@@ -39,7 +39,6 @@ $(OBJ_DIR)/ast.o: $(SRC_DIR)/ast.c $(INCLUDE_DIR)/matrix.h
 
 # Compilation in debug mode
 
-
 # Lex/Yacc targets
 $(SRC_DIR)/y.tab.c: $(SRC_DIR)/matc.y
 	yacc -v --defines=$(INCLUDE_DIR)/y.tab.h -o $(SRC_DIR)/y.tab.c $<
@@ -57,7 +56,7 @@ all_tests: test_lex test_yacc
 # Lexer test
 test_lex: $(BIN_DIR)/lexer
 
-$(BIN_DIR)/lexer: $(OBJ_DIR)/matc_test_lex.o $(OBJ_DIR)/y.tab_test_lex.o
+$(BIN_DIR)/lexer: $(OBJ_DIR)/matc_test_lex.o $(OBJ_DIR)/y.tab_test_lex.o $(OBJ_DIR)/symbol_table.o $(OBJ_DIR)/types.o
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_DIR)/y.tab_test_lex.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug.h
