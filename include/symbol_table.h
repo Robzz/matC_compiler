@@ -34,7 +34,7 @@ void delete_symbol_table(SymbolTable* s);
 /* Look for a symbol in the table.
  * If successful, stores the address of the record in ptr and return true.
  * Return false otherwise. */
-bool lookup_symbol(char* ident, TableRecord* ptr);
+bool lookup_symbol(SymbolTable* s, char* ident, TableRecord** ptr);
 
 /* */
 void add_symbol(SymbolTable* s, TableRecord* tr);
