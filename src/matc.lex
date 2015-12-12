@@ -1,5 +1,7 @@
 %{
 
+#include "types.h"
+#include "symbol_table.h"
 #include "y.tab.h"
 #include "debug.h"
 

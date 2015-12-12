@@ -28,13 +28,11 @@ RecordList* new_record_list() {
 }
 
 void delete_record_list(RecordList* l) {
-    RecordList* it = l;
-    while(it) {
-        if(it->rec)
-            delete_record(it->rec);
-        RecordList* t = it;
-        it = it->next;
-        free(t);
+    if(l) {
+        if(l->rec)
+            delete_record(l->rec);
+        delete_record_list(l->next);
+        free(l);
     }
 }
 
@@ -76,11 +74,6 @@ void add_symbol(SymbolTable* s, TableRecord* tr) {
     unsigned int h = hash_str(tr->ident);
     unsigned int i = h % N_BUCKETS;
     RecordList* l = s->buckets[i];
-    if(!l) {
-        s->buckets[i] = new_record_list();
-        list_add_record(s->buckets[i], tr);
-        return;
-    }
     if(!list_search_record(l, tr->ident)) {
         list_add_record(l, tr);
     }

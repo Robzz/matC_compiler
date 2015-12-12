@@ -2,6 +2,7 @@
 TEST_LEX=0
 TEST_YACC=0
 TEST_UNIT=0
+SUCCESS=1
 
 parse_args() {
     if [[ -z $@ ]]; then
@@ -38,6 +39,7 @@ if [[ $TEST_LEX != 0 ]]; then
             echo -e 'Lexing test file '"$f"': \e[32mSUCCESS\e[0m'
         else
             echo -e 'Lexing test file '"$f"': \e[31mFAILURE\e[0m'
+            SUCCESS=0
         fi
     done
 fi
@@ -54,6 +56,7 @@ if [[ $TEST_YACC != 0 ]]; then
             echo -e 'Parsing test file '"$f"': \e[32mSUCCESS\e[0m'
         else
             echo -e 'Parsing test file '"$f"': \e[31mFAILURE\e[0m'
+            SUCCESS=0
         fi
     done
 fi
@@ -75,6 +78,11 @@ if [[ $TEST_UNIT != 0 ]]; then
             echo -e 'Unit test '"$f"': \e[32mSUCCESS\e[0m'
         else
             echo -e 'Unit test '"$f"': \e[31mFAILURE\e[0m'
+            SUCCESS=0
         fi
     done
+fi
+
+if [[ ! $SUCCESS -eq 1 ]]; then
+    exit 1
 fi

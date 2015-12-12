@@ -1,6 +1,8 @@
 #include "types.h"
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
+
 
 Type* new_type(TypeFamily t) {
     Type* tt = malloc(sizeof(Type));
@@ -48,7 +50,7 @@ void print_type(const Type* t) {
         case MATRIX:
             printf("matrix[%lu]", t->arr_info->size);
             if(t->arr_info->elem_t->tf == MATRIX)
-            printf("[%lu]", t->arr_info->elem_t->arr_info->size);
+                printf("[%lu]", t->arr_info->elem_t->arr_info->size);
             break;
         case ARRAY:
             printf("array");
@@ -61,4 +63,19 @@ void print_type(const Type* t) {
             printf(")");
             break;
     }
+}
+
+Type* type_of_str(const char* str) {
+    TypeFamily tf;
+    if(!strcmp(str, "int")) 
+        tf = INT; 
+    else if(!strcmp(str, "float"))
+        tf = FLOAT; 
+    else if(!strcmp(str, "matrix"))
+        tf = MATRIX; 
+    else
+        return NULL;
+    Type* t = new_type(tf);
+
+    return t;
 }

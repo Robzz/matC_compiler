@@ -1,5 +1,6 @@
 #include "symbol_table.h"
 #include <stdio.h>
+#include <assert.h>
 
 int main(int argc, char** argv) {
     SymbolTable* s = new_symbol_table();
@@ -15,6 +16,8 @@ int main(int argc, char** argv) {
     add_symbol(s, new_record("m2", m2));
 
     print_symbol_table(s);
+
+    assert(lookup_symbol(s, "a1", NULL));
 
     delete_symbol_table(s);
 
