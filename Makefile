@@ -28,7 +28,7 @@ $(OBJ_DIR)/matrix.o: $(SRC_DIR)/matrix.c
 $(OBJ_DIR)/types.o: $(SRC_DIR)/types.c $(INCLUDE_DIR)/types.h
 	$(CC) $(CFLAGS) -o $@ $<
 
-$(OBJ_DIR)/symbol_table.o: $(SRC_DIR)/symbol_table.c $(INCLUDE_DIR)/symbol_table.h $(INCLUDE_DIR)/types.h
+$(OBJ_DIR)/symbol_table.o: $(SRC_DIR)/symbol_table.c $(INCLUDE_DIR)/symbol_table.h $(INCLUDE_DIR)/types.h $(INCLUDE_DIR)/quad.h 
 	$(CC) $(CFLAGS) -o $@ $<
 
 $(OBJ_DIR)/quad.o: $(SRC_DIR)/quad.c $(INCLUDE_DIR)/quad.h $(INCLUDE_DIR)/symbol_table.h
@@ -53,10 +53,10 @@ $(SRC_DIR)/matc.c: $(SRC_DIR)/matc.lex
 # Testing targets
 all_tests: test_lex test_yacc
 
-# Lexer test
+# Lexer test.y
 test_lex: $(BIN_DIR)/lexer
 
-$(BIN_DIR)/lexer: $(OBJ_DIR)/matc_test_lex.o $(OBJ_DIR)/y.tab_test_lex.o $(OBJ_DIR)/symbol_table.o $(OBJ_DIR)/types.o
+$(BIN_DIR)/lexer: $(OBJ_DIR)/matc_test_lex.o $(OBJ_DIR)/y.tab_test_lex.o $(OBJ_DIR)/symbol_table.o $(OBJ_DIR)/types.o $(OBJ_DIR)/quad.o
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_DIR)/y.tab_test_lex.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug.h
@@ -68,7 +68,7 @@ $(OBJ_DIR)/matc_test_lex.o: $(SRC_DIR)/matc.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_D
 # Parser test
 test_yacc: $(BIN_DIR)/parser
 
-$(BIN_DIR)/parser: $(OBJ_DIR)/matc_test_yacc.o $(OBJ_DIR)/y.tab_test_yacc.o $(OBJ_DIR)/symbol_table.o $(OBJ_DIR)/types.o
+$(BIN_DIR)/parser: $(OBJ_DIR)/matc_test_yacc.o $(OBJ_DIR)/y.tab_test_yacc.o $(OBJ_DIR)/symbol_table.o $(OBJ_DIR)/types.o $(OBJ_DIR)/quad.o
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_DIR)/y.tab_test_yacc.o: $(SRC_DIR)/y.tab.c $(INCLUDE_DIR)/y.tab.h $(INCLUDE_DIR)/debug.h

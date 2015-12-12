@@ -3,14 +3,15 @@
 #include <stdlib.h>
 #include "debug.h"
 #include "types.h"
-
 #include "symbol_table.h"
+#include "quad.h"
 
 SymbolTable* symtable;
 TypeFamily lasttype;
 RecordList* new_symbols;
 
 int yylex();
+void lex_free();
 
 void yyerror(char* str) {
     fprintf(stderr, str);
@@ -27,17 +28,21 @@ TypeFamily typename_to_typefamily(int token);
     int i;
     float f;
     char* s;
-    TableRecord* t;
+    struct {
+        TableRecord * result;
+        struct quad * code;
+    }codegen;
 }
-
-%token MATRIX_TKN INT_TKN FLOAT_TKN VOID NEQ EQ INCR DECR AND OR CONST IF ELSE WHILE FOR SUP INF SUPEQ INFEQ STRING RETURN
-%token integer id 
-%token fp /* float */
-
-%type <i> integer;
+ 
+%token <codegen> MATRIX_TKN INT_TKN FLOAT_TKN VOID NEQ EQ INCR DECR AND OR CONST OPPAR CLPAR OPBRACKET CLBRACKET
+%token <codegen> IF ELSE WHILE FOR SUP INF SUPEQ INFEQ STRING RETURN MINUS PLUS MULT DIV TILDE MOD
+%token <i> integer 
+%token <s> id 
+%token <f> fp
+        
 %type <i> type_name;
-%type <f> fp;
-%type <s> id;
+%type <codegen> expr matrix_extraction function_call boolean_expr increment decrement value number
+%type <codegen> matrix_value matrix_line line_list arithmetic_expr
 
 %left '[' ']'
 %left '*' '/'
@@ -81,13 +86,13 @@ number : integer { DBG(printf("Yacc : int %d\n", $1)); }
 number_list: number
            | number_list ',' number
 
-value: number
-       | matrix_value
+value: number 
+       | matrix_value 
 
 matrix_value: matrix_line
-              | '{' line_list '}'
+              | OPBRACKET line_list CLBRACKET
 
-matrix_line: '{' number_list '}' { DBG(printf("Yacc : matrix line")); }
+              matrix_line: OPBRACKET number_list CLBRACKET { DBG(printf("Yacc : matrix line")); }
 
 matrix_extraction: expr '[' interval_list ']' { printf("Yacc : matrix extraction\n"); }
 
@@ -99,13 +104,14 @@ interval: '*'
           | integer '.' '.' integer
 
 /* */
-block: '{' statement_list '}'
+block: OPBRACKET statement_list CLBRACKET
 
 instr: statement
        | fn_decl
 
 /* Function declaration */
-fn_decl: type_name id '(' fn_decl_param_list ')' block { DBG(printf("Yacc : declaring function\n")); }
+
+fn_decl: type_name id OPPAR fn_decl_param_list CLPAR block { DBG(printf("Yacc : declaring function\n")); }
 
 fn_decl_param_list: 
                     | fn_decl_param_list ',' type_name id
@@ -144,7 +150,7 @@ decl_or_init: decl_id
 decl_id: id { DBG(printf("Yacc : declaring variable %s\n", $1));
               // add_symbol(symtable, new_type(FLOAT)));
               list_add_record(new_symbols, new_record($1, new_type(FLOAT))); } /* TODO : this is SHIT. Not the real type */
-         | id '[' integer ']' { DBG(printf("Yacc : declaring 1D matrix %s (size %d)\n", $1, $3));
+         | id '[' integer ']' { DBG(printf("Y   acc : declaring 1D matrix %s (size %d)\n", $1, $3));
                                 // add_symbol(symtable, new_record($1, new_matrix_type(1, $3))); 
                                 list_add_record(new_symbols, new_record($1, new_matrix_type(1, $3))); }
          | id '[' integer ']' '[' integer ']' { DBG(printf("Yacc : declaring 2D matrix %s (size (%d,%d))\n", $1, $3, $6));
@@ -157,10 +163,10 @@ line_list: matrix_line
            | line_list ',' matrix_line
 
 /* expressions */
-expr: STRING
-      | '(' expr ')'
-      | id
-      | value { }
+expr: STRING                
+      | OPPAR expr CLPAR
+      | id                
+      | value  
       | matrix_extraction
       | function_call
       | arithmetic_expr
@@ -174,15 +180,22 @@ increment: INCR id { DBG(printf("Yacc : incr %s\n", $2)); }
 decrement: DECR id { DBG(printf("Yacc : decr %s \n", $2)); }
            | id DECR { DBG(printf("Yacc : %s decr \n", $1)); }
 
-arithmetic_expr: expr '+' expr
-                 | expr '-' expr
-                 | expr '*' expr
-                 | expr '/' expr
-                 | expr '%' expr
-                 | '-' expr %prec UNARY
-                 | '+' expr %prec UNARY
-                 | '~' expr %prec UNARY
-
+arithmetic_expr: expr PLUS expr 
+//                                {  TableRecord * rec1;
+//                                  TableRecord * rec2;
+//                                  if (lookup_symbol(s, $1, &rec1) == true) {
+//                                    if (lookup_symbol(s, $2, &rec2) == true) {
+//                                        aQuad new = newQuad(rec1, rec2, OP_PLUS, null);
+//                                        list = addQuadTailList(list, new);
+//                                    }
+//                                  }}
+                 | expr MINUS expr 
+                 | expr MULT expr
+                 | expr DIV expr
+                 | expr MOD expr
+                 | MINUS expr %prec UNARY
+                 | PLUS expr %prec UNARY
+                 | TILDE expr %prec UNARY
 boolean_expr: expr AND expr { DBG(printf("Yacc : AND expression\n")); }
               | expr OR expr { DBG(printf("Yacc : OR expression\n")); }
               | '!' expr { DBG(printf("Yacc : NOT expression\n")); }
@@ -194,11 +207,11 @@ boolean_expr: expr AND expr { DBG(printf("Yacc : AND expression\n")); }
               | expr '<' expr { DBG(printf("Yacc : comparison expression\n")); }
 
 /* condition declaration */
-condition: IF '(' expr ')' block
-           | IF '(' expr ')' block ELSE block
+condition: IF OPPAR expr CLPAR block
+           | IF OPPAR expr CLPAR block ELSE block
 
 /* function call */
-function_call: id '(' parameter_list ')' { DBG(printf("Yacc : calling function %s\n", $1)); }
+function_call: id OPPAR parameter_list CLPAR { DBG(printf("Yacc : calling function %s\n", $1)); }
 
 parameter_list: 
                 | expr
@@ -208,9 +221,9 @@ parameter_list:
 loop: loop_for block { DBG(printf("Yacc : parsed loop \n")); }
     | loop_while block { DBG(printf("Yacc : parsed loop \n")); }
 
-loop_for: FOR '(' primary_statement ';' expr ';' primary_statement ')' { DBG(printf("Yacc : FOR loop \n")); }
+loop_for: FOR OPPAR primary_statement ';' expr ';' primary_statement CLPAR { DBG(printf("Yacc : FOR loop \n")); }
 
-loop_while: WHILE '(' expr ')' { DBG(printf("Yacc : WHILE loop \n")); }
+loop_while: WHILE OPPAR expr CLPAR { DBG(printf("Yacc : WHILE loop \n")); }
 %%
 
 TypeFamily typename_to_typefamily(int token) {
@@ -227,9 +240,15 @@ int main(int argc, char** argv) {
 #endif
     symtable = new_symbol_table();
     new_symbols = new_record_list();
+    listQuad list = newQuadList();
     int r = yyparse();
+    printf("content symbol table : \n");
     print_symbol_table(symtable);
+    printf("content quad list : \n");
+    printList(list);
+    destroyList(list);
     delete_symbol_table(symtable);
+    lex_free();
     return r;
 }
 #endif

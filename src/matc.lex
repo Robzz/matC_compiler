@@ -6,7 +6,10 @@
 #include "debug.h"
 
 extern void yyerror(char*);
-
+void lex_free(){
+    yy_delete_buffer(YY_CURRENT_BUFFER);
+    free(yy_buffer_stack);
+}
 %}
 
 %option nounput
@@ -47,11 +50,21 @@ void      { DBG(printf("Lex : void\n")); return VOID; }
 ==        { DBG(printf("Lex : operator ==\n")); return EQ; }
 \>        { DBG(printf("Lex : operator >\n")); return SUP; }
 \<        { DBG(printf("Lex : operator <\n")); return INF; }
-\<=        { DBG(printf("Lex : operator <=\n")); return INFEQ; }
-\>=        { DBG(printf("Lex : operator >=\n")); return SUPEQ; }
+\<=       { DBG(printf("Lex : operator <=\n")); return INFEQ; }
+\>=       { DBG(printf("Lex : operator >=\n")); return SUPEQ; }
 \+\+      { DBG(printf("Lex : operator ++\n")); return INCR; }
 --        { DBG(printf("Lex : operator --\n")); return DECR; }
-[-+*/~=(){};,.\[\]] { DBG(printf("Lex : token %c\n", *yytext)); return *yytext; }
+"-"       { DBG(printf("Lex : operator -\n")); return MINUS; }
+"+"       { DBG(printf("Lex : operator +\n")); return PLUS; }
+"*"       { DBG(printf("Lex : operator *\n")); return MULT; }
+"/"       { DBG(printf("Lex : operator /\n")); return DIV; }
+"~"       { DBG(printf("Lex : operator /\n")); return TILDE; }
+"%"       { DBG(printf("Lex : operator /\n")); return MOD; }
+"("       { DBG(printf("Lex : ( \n")); return OPPAR; }
+")"       { DBG(printf("Lex : ) \n")); return CLPAR; }
+"{"       { DBG(printf("Lex : { \n")); return OPBRACKET; }
+"}"       { DBG(printf("Lex : } \n")); return CLBRACKET; }
+[=(){};,.\[\]] { DBG(printf("Lex : token %c\n", *yytext)); return *yytext; }
 [ \t\n]   ;
 .         { DBG(printf("Lex : unknown token %c\n", *yytext)); yyerror("Unknown character\n"); }
 
