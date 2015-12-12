@@ -31,4 +31,6 @@ void delete_type(Type* t);
 
 void print_type(const Type* t);
 
+Type* type_of_str(const char* str);
+
 #endif
