@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "quad.h"
 
-aQuad newQuad(SymbolTable arg1, SymbolTable arg2, char op, SymbolTable res) {
+aQuad newQuad(TableRecord * arg1, TableRecord * arg2, char op, TableRecord * res) {
     aQuad new = malloc(sizeof (struct quad));
     new->label = 0;
     new->op = op;
@@ -95,5 +95,12 @@ void printList(listQuad quads) {
  * print a quad 
  */
 void printQuad(aQuad quad) {
-   // printf("%d: %d %c %d = %d\n", quad->label, quad->arg1, quad->op, quad->arg2, quad->res);
+    printf("label : %d\n", quad->label);
+    printf("%s : ", quad->arg1->ident);
+    print_type(quad->arg1->t);
+    printf("\n");
+    print_symbol_table(quad->arg1);
+    print_symbol_table(quad->arg2);
+    printf("op : %c\n", quad->op);
+    print_symbol_table(quad->res);
 }

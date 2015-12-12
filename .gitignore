@@ -40,6 +40,7 @@ src/y.tab.c
 src/y.output
 .ycm_extra_conf.*
 tests/unit/symtable
+tests/unit/quad
 tests/unit/types
 .vimrc
 

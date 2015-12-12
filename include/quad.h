@@ -8,16 +8,16 @@
 #define QUAD_H
 #include "symbol_table.h"
 
-typedef struct quad{
+typedef struct quad {
     int label;
     char op;
-    SymbolTable arg1;
-    SymbolTable arg2;
-    SymbolTable res;
+    TableRecord * arg1;
+    TableRecord * arg2;
+    TableRecord * res;
     struct quad* next;
 } * aQuad;
 
-typedef struct quad_list{
+typedef struct quad_list {
     aQuad head;
     int number;
 } * listQuad;
@@ -25,7 +25,7 @@ typedef struct quad_list{
 /*
  * Generate a new quad
  */
-aQuad newQuad(SymbolTable arg1, SymbolTable arg2, char op, SymbolTable res);
+aQuad newQuad(SymbolTable * arg1, SymbolTable * arg2, char op, SymbolTable * res);
 
 /*
  * Create a new quad List
