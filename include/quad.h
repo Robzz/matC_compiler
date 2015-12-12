@@ -8,9 +8,11 @@
 #define QUAD_H
 #include "symbol_table.h"
 
+typedef enum { OP_PLUS, OP_MINUS, OP_MUL, OP_DIV, OP_MOD, OP_UNARY_MINUS } Op;
+
 typedef struct quad {
     int label;
-    char op;
+    Op op;
     TableRecord * arg1;
     TableRecord * arg2;
     TableRecord * res;
@@ -25,7 +27,7 @@ typedef struct quad_list {
 /*
  * Generate a new quad
  */
-aQuad newQuad(TableRecord * arg1, TableRecord * arg2, char op, TableRecord * res);
+aQuad newQuad(TableRecord * arg1, TableRecord * arg2, Op op, TableRecord * res);
 
 /*
  * Create a new quad List

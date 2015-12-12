@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "quad.h"
 
-aQuad newQuad(TableRecord * arg1, TableRecord * arg2, char op, TableRecord * res) {
+aQuad newQuad(TableRecord * arg1, TableRecord * arg2, Op op, TableRecord * res) {
     aQuad new = malloc(sizeof (struct quad));
     new->label = 0;
     new->op = op;
