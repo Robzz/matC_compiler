@@ -11,12 +11,14 @@ int main(int argc, char** argv) {
     add_symbol(s, new_record("i1", i));
     add_symbol(s, new_record("f1", f));
     add_symbol(s, new_record("a1", a1));
+    add_symbol(s, new_record("m1", m1));
+    add_symbol(s, new_record("m2", m2));
 
     print_symbol_table(s);
     listQuad list = newQuadList();
-    TableRecord * rec1 = NULL;
-    TableRecord * rec2 = NULL;
-    TableRecord * rec3 = NULL;
+    TableRecord * rec1;
+    TableRecord * rec2;
+    TableRecord * rec3;
     aQuad new = NULL;
     printf("init:");
     if (lookup_symbol(s, "il", &rec1) == true) {
@@ -35,7 +37,7 @@ int main(int argc, char** argv) {
         list = addQuadHeadList(list, new);
         printList(list);
     }
-    destroyHeadList(list);
+    destroyList(list);
     delete_symbol_table(s);
 
     return 0;
