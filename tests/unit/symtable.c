@@ -17,7 +17,11 @@ int main(int argc, char** argv) {
 
     print_symbol_table(s);
 
+    assert(lookup_symbol(s, "i1", NULL));
+    assert(lookup_symbol(s, "f1", NULL));
     assert(lookup_symbol(s, "a1", NULL));
+    assert(lookup_symbol(s, "m1", NULL));
+    assert(lookup_symbol(s, "m2", NULL));
 
     delete_symbol_table(s);
 
