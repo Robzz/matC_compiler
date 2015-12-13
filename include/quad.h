@@ -8,6 +8,7 @@
 #define QUAD_H
 #include "symbol_table.h"
 
+/* Available arithmetic and logic operations */
 typedef enum { OP_PLUS, OP_MINUS, OP_MUL, OP_DIV, OP_MOD, OP_UNARY_MINUS } Op;
 
 typedef struct quad {
@@ -54,6 +55,7 @@ listQuad addQuadPosList(listQuad quads, aQuad newquad, int lab);
  * return quad with label; NULL if not exist
  */
 aQuad getQuadLab(listQuad quads, aQuad newquad, int lab);
+
 /*
  * print quad list
  */
