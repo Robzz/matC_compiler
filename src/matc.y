@@ -81,8 +81,14 @@ statement_list: statement
 return: RETURN expr { DBG(printf("Yacc : return statement\n")); }
 
 /* Literal values */
-number : integer { DBG(printf("Yacc : int %d\n", $1)); }
-         | fp { DBG(printf("Yacc : float %f\n", $1)); }
+number : integer 
+                {  DBG(printf("Yacc : int %d\n", $1));
+                    $$.result->value.int_v=$1;
+                }
+         | fp 
+              { DBG(printf("Yacc : float %f\n", $1)); 
+                $$.result->value.float_v=$1;
+              }
 
 number_list: number
            | number_list ',' number
@@ -135,6 +141,7 @@ declaration: type_name decl_list {
             t->tf = tf;
         }
         add_symbol(symtable, it->rec);
+        $$.result=it->rec;
     }
 
     // "Clear" the list
@@ -166,7 +173,14 @@ line_list: matrix_line
 /* expressions */
 expr: STRING                
       | OPPAR expr CLPAR
-      | id                
+      | id      
+                {  
+                TableRecord * tmp;
+                if (lookup_symbol(symtable, $1, &tmp) == true) {
+                    $$.result=tmp;
+                }
+                $$.code=NULL;
+                }
       | value  
       | matrix_extraction
       | function_call
@@ -181,24 +195,19 @@ increment: INCR id { DBG(printf("Yacc : incr %s\n", $2)); }
 decrement: DECR id { DBG(printf("Yacc : decr %s \n", $2)); }
            | id DECR { DBG(printf("Yacc : %s decr \n", $1)); }
 
-arithmetic_expr: expr PLUS expr 
-                                    //{$$.result=temp symbol
-//                                  if($1.result->t == $3.result->t){
-//                                      if($1.result->t->tf == INT){
-//                                      }
-//                                      if($1.result->t->tf == FLOAT){
-//                                      }
-//                                  }
-
-//                                  TableRecord * rec1;
-//                                  TableRecord * rec2;
-//                                  if (lookup_symbol(s, $1, &rec1) == true) {
-//                                    if (lookup_symbol(s, $2, &rec2) == true) {
-//                                        aQuad new = newQuad(rec1, rec2, OP_PLUS, null);
-//                                        list = addQuadTailList(list, new);
-//                                    }
-//                                  }
-//                                }
+arithmetic_expr: expr PLUS expr
+                                    {
+                                      if($1.result->t->tf  == $3.result->t->tf){
+                                        if($1.result->t->tf == INT){
+                                          $$.result->value.int_v=$1.result->value.int_v + $3.result->value.int_v;
+                                        }
+                                        if($1.result->t->tf == FLOAT){
+                                          $$.result->value.float_v=$1.result->value.float_v + $3.result->value.float_v;
+                                        }
+                                      }
+                                        aQuad new = newQuad($1.result, $2.result, OP_PLUS, $3.result);
+                                        list = addQuadTailList(list, new);
+                                    }
                  | expr MINUS expr 
                  | expr MULT expr
                  | expr DIV expr
