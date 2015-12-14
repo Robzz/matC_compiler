@@ -25,6 +25,9 @@ void yyerror(char* str) {
 #endif
 }
 
+/* Print an error message and exit */
+void span_error(char* msg);
+
 TypeFamily typename_to_typefamily(int token);
 
 %}
@@ -93,12 +96,14 @@ number : integer {
         $$.result = new_record("<literal>", new_type(INT));
         $$.result->val.int_v = $1;
         $$.code = NULL;
+        list_add_record(temp_syms, $$.result);
     }
          | fp {
         DBG(printf("Yacc : float %f\n", $1)); 
         $$.result = new_record("<literal>", new_type(FLOAT));
         $$.result->val.float_v = $1;
         $$.code = NULL;
+        list_add_record(temp_syms, $$.result);
     }
 
 number_list: number
@@ -195,7 +200,14 @@ decl_id: id {
 
 initialization: decl_id AFFECT expr {
         DBG(printf("Yacc : initializing variable\n"));
-        aQuad q = newQuad($3.result, NULL, OP_AFFECT, $1.result);
+        aQuad q;
+        if($3.code)
+            // Initializing from operation
+            q = newQuad($3.code->res, NULL, OP_AFFECT, $1.result);
+        else {
+            // Initializing with literal value
+            q = newQuad($3.result, NULL, OP_AFFECT, $1.result);
+        }
         addQuadTailList(list, q);
         $$ = $1;
     }
@@ -248,9 +260,26 @@ arithmetic_expr: expr PLUS expr {
                 $$.result->val.float_v=$1.result->val.float_v + $3.result->val.float_v;
             }
         }*/
-        TableRecord* dest = new_record("<temp>", NULL);
-        list_add_record(temp_syms, dest);
+        /* Find the destination type, according to the following rules :
+         *  * T + T -> T
+         *  * int + float -> float
+         */
+        Type *dest_type,
+             *t1 = $1.result ? $1.result->t : $1.code->res->t,
+             *t2 = $3.result ? $3.result->t : $3.code->res->t;
+        if(t1->tf == t2->tf)
+            dest_type = copy_type(t1);
+        else if((t1->tf == FLOAT && t2->tf == INT) || (t1->tf == INT && t2->tf == FLOAT))
+            dest_type = new_type(FLOAT);
+        else {
+            char buf[1024];
+            sprintf(buf, "Incompatible types %s and %s passed to operator +", type_name(t1->tf), type_name(t2->tf));
+            span_error(buf);
+        }
+        TableRecord* dest = new_record("<temp>", dest_type);
+        add_symbol(symtable, dest);
         aQuad new = newQuad($1.result, $3.result, OP_PLUS, dest);
+        addQuadTailList(list, new);
         $$.code = new;
     }
                  | expr MINUS expr 
@@ -333,6 +362,11 @@ TypeFamily typename_to_typefamily(int token) {
                                  UNREACHABLE();
 }
 
+void span_error(char* msg) {
+    printf("%s\n", msg);
+    exit(1);
+}
+
 #ifndef LEXER_TEST_BUILD
 int main(int argc, char** argv) {
 #ifdef DEBUG
@@ -341,6 +375,7 @@ int main(int argc, char** argv) {
     symtable = new_symbol_table();
     static_strings = new_symbol_table();
     new_symbols = new_record_list();
+    temp_syms = new_record_list();
     list = newQuadList();
     int r = yyparse();
     printf("content symbol table : \n");

@@ -11,6 +11,17 @@ Type* new_type(TypeFamily t) {
     return tt;
 }
 
+Type* copy_type(Type* t) {
+    Type* t2 = malloc(sizeof(Type));
+    t2->tf = t->tf;
+    if(t->arr_info) {
+        t2->arr_info = malloc(sizeof(ArrayType));
+        t2->arr_info->size = t->arr_info->size;
+        t2->arr_info->elem_t = copy_type(t->arr_info->elem_t);
+    }
+    return t2;
+}
+
 Type* new_array_type(size_t size, Type* t) {
     Type* tt = new_type(ARRAY);
     tt->arr_info = malloc(sizeof(ArrayType));
@@ -33,13 +44,35 @@ Type* new_matrix_type(size_t rows, size_t columns) {
 }
 
 void delete_type(Type* t) {
-    if(t->arr_info)
-        delete_type(t->arr_info->elem_t);
-    free(t->arr_info);
-    free(t);
+    if(t) {
+        if(t->arr_info) {
+            delete_type(t->arr_info->elem_t);
+            free(t->arr_info);
+        }
+        free(t);
+    }
+}
+
+char* type_name(TypeFamily tf) {
+    switch(tf) {
+        case INT:
+            return "int";
+        case FLOAT:
+            return "float";
+        case MATRIX:
+            return "matrix";
+        case ARRAY:
+            return "array";
+        case STRING:
+            return "string";
+    }
 }
 
 void print_type(const Type* t) {
+    if(!t) {
+        printf("none");
+        return;
+    }
     switch(t->tf) {
         case INT:
             printf("int");

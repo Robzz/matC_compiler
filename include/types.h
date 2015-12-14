@@ -33,6 +33,10 @@ typedef struct Type_s {
 
 /* Create a new type */
 Type* new_type(TypeFamily t);
+
+/* Copy an existing type */
+Type* copy_type(Type* t);
+
 /* Create a new array type */
 Type* new_array_type(size_t size, Type *t);
 /* Create a new matrix type of specified dimensions.
@@ -42,8 +46,13 @@ Type* new_matrix_type(size_t rows, size_t columns);
 /* Delete a type */
 void delete_type(Type* t);
 
+char* type_name(TypeFamily tf);
+
 /* Print a type */
 void print_type(const Type* t);
+
+/* Return the size in bytes of a type */
+size_t type_size(Type* t);
 
 /* Convert the name of a type to the actual type */
 Type* type_of_str(const char* str);
