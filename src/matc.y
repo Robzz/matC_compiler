@@ -90,13 +90,13 @@ return: RETURN expr { DBG(printf("Yacc : return statement\n")); }
 /* Literal values */
 number : integer {  
         DBG(printf("Yacc : int %d\n", $1));
-        $$.result = new_record("temp", new_type(INT));
+        $$.result = new_record("<literal>", new_type(INT));
         $$.result->val.int_v = $1;
         $$.code = NULL;
     }
          | fp {
         DBG(printf("Yacc : float %f\n", $1)); 
-        $$.result = new_record("temp", new_type(FLOAT));
+        $$.result = new_record("<literal>", new_type(FLOAT));
         $$.result->val.float_v = $1;
         $$.code = NULL;
     }
@@ -129,14 +129,20 @@ instr: statement
 
 /* Function declaration */
 
-fn_decl: type_name id OPPAR fn_decl_param_list CLPAR block { DBG(printf("Yacc : declaring function\n")); }
+fn_decl: type_name id OPPAR fn_decl_param_list CLPAR block {
+        DBG(printf("Yacc : declaring function\n"));
+        free($2);
+    }
 
 fn_decl_param_list:
-                    | fn_decl_param_list ',' type_name id
-                    | type_name id
+                    | fn_decl_param_list ',' type_name id { free($4); }
+                    | type_name id { free($2); }
 
 /* assignement */
-assignment: id AFFECT expr { DBG(printf("Yacc : assignement %s\n", $1)); }
+assignment: id AFFECT expr {
+        DBG(printf("Yacc : assignement %s\n", $1));
+        free($1);
+    }
 
 matrix_element_assignment: matrix_extraction AFFECT expr
 
@@ -169,8 +175,9 @@ decl_or_init: decl_id
 decl_id: id {
         DBG(printf("Yacc : declaring variable %s\n", $1));
         // Types are wrong, they're fixed in the declaration rule
-        list_add_record(new_symbols, new_record($1, new_type(FLOAT)));
-        $$.result = list_search_record(new_symbols, $1);
+        TableRecord* rec = new_record($1, new_type(FLOAT));
+        list_add_record(new_symbols, rec);
+        $$.result = rec;
         $$.code = NULL;
     }
          | id '[' integer ']' {
@@ -197,30 +204,42 @@ line_list: matrix_line
            | line_list ',' matrix_line
 
 /* expressions */
-expr: OPPAR expr CLPAR
+expr: OPPAR expr CLPAR { $$ = $2; }
       | id {
         TableRecord * tmp;
         lookup_symbol(symtable, $1, &tmp);
         $$.result = tmp;
         $$.code=NULL;
+        free($1);
     }
-      | value {
-        $$ = $1;
-    }
+      | value { $$ = $1; }
       | matrix_extraction
-      | function_call
-      | arithmetic_expr
+      | function_call { $$ = $1; }
+      | arithmetic_expr { $$ = $1; }
       | boolean_expr
       | increment
       | decrement
 
-increment: INCR id { DBG(printf("Yacc : incr %s\n", $2)); }
-           | id INCR { DBG(printf("Yacc : %s incr \n", $1)); }
+increment: INCR id {
+        DBG(printf("Yacc : incr %s\n", $2));
+        free($2);
+    }
+           | id INCR {
+        DBG(printf("Yacc : %s incr \n", $1));
+        free($1);
+    }
 
-decrement: DECR id { DBG(printf("Yacc : decr %s \n", $2)); }
-           | id DECR { DBG(printf("Yacc : %s decr \n", $1)); }
+decrement: DECR id {
+        DBG(printf("Yacc : decr %s \n", $2));
+        free($2);
+    }
+           | id DECR {
+        DBG(printf("Yacc : %s decr \n", $1));
+        free($1);
+    }
 
 arithmetic_expr: expr PLUS expr {
+        /*
         if($1.result->t->tf == $3.result->t->tf) {
             if($1.result->t->tf == INT){
                 $$.result->val.int_v=$1.result->val.int_v + $3.result->val.int_v;
@@ -228,9 +247,11 @@ arithmetic_expr: expr PLUS expr {
             if($1.result->t->tf == FLOAT){
                 $$.result->val.float_v=$1.result->val.float_v + $3.result->val.float_v;
             }
-        }
-        aQuad new = newQuad($1.result, $2.result, OP_PLUS, $3.result);
-        list = addQuadTailList(list, new);
+        }*/
+        TableRecord* dest = new_record("<temp>", NULL);
+        list_add_record(temp_syms, dest);
+        aQuad new = newQuad($1.result, $3.result, OP_PLUS, dest);
+        $$.code = new;
     }
                  | expr MINUS expr 
                  | expr MULT expr
@@ -260,6 +281,7 @@ function_call: id OPPAR string CLPAR {
             // Error : only printf accepts strings
         }
         else {
+            // TODO : check if the string already exists to avoid unneeded duplication
             ++nstrings;
             int n_chars = 6;
             for(int i = nstrings ; i != 0 ; i /= 10)
@@ -272,6 +294,7 @@ function_call: id OPPAR string CLPAR {
             aQuad q = newQuad(rec, NULL, OP_PRINTF, NULL);
             addQuadTailList(list, q);
         }
+        free($1);
 }
                | id OPPAR parameter_list CLPAR {
         DBG(printf("Yacc : calling function %s\n", $1));
@@ -281,6 +304,7 @@ function_call: id OPPAR string CLPAR {
             addQuadTailList(list, q);
         }
         free($3);
+        free($1);
     }
 
 parameter_list: { $$ = NULL; }
@@ -327,6 +351,8 @@ int main(int argc, char** argv) {
     ir_to_asm("out.s", list, symtable, static_strings);
 
     destroyList(list);
+    delete_record_list(new_symbols);
+    delete_record_list(temp_syms);
     delete_symbol_table(symtable);
     delete_symbol_table(static_strings);
     lex_free();

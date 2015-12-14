@@ -16,11 +16,16 @@ TableRecord* new_record(char* ident, Type* t) {
 }
 
 void delete_record(TableRecord* rec) {
-    free(rec->ident);
-    if(rec->t->tf == STRING && rec->val.str_v)
-        free(rec->val.str_v);
-    delete_type(rec->t);
-    free(rec);
+    if(rec) {
+        if(rec->ident)
+            free(rec->ident);
+        if(rec->t) {
+        if(rec->t->tf == STRING && rec->val.str_v)
+            free(rec->val.str_v);
+            delete_type(rec->t);
+        }
+        free(rec);
+    }
 }
 
 RecordList* new_record_list() {
