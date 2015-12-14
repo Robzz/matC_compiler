@@ -1,0 +1,14 @@
+int main() {
+    int i = 42, j = 43;
+    int k = 5 + 2;
+    float f = 42.314;
+    printf("i = ");
+    print(i);
+    printf(", j = ");
+    print(j);
+    printf(", k = ");
+    print(k);
+    printf("\nf = ");
+    print(f);
+    printf("\n");
+}
