@@ -7,7 +7,7 @@ void load_immediate(bool fp, int addr, value val);
 
 void store(int reg, int addr);
 
-void print_int(int addr);
+void print_num(TableRecord* rec);
 
 void print_string();
 

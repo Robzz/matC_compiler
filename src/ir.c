@@ -8,24 +8,33 @@ int sp;
 
 void load_immediate(bool fp, int addr, value val) {
     if(fp) {
-        // TODO
+        sprintf(buf, "%f", val.float_v);
+        fprintf(f, "li.s $f0, %s\n", buf);
+        store(0, addr);
     }
     else {
         sprintf(buf, "%d", val.int_v);
-        fprintf(f, "li $v0, %s\n", buf);
+        fprintf(f, "li $t0, %s\n", buf);
         store(0, addr);
     }
 }
 
 void store(int reg, int addr) {
     sprintf(buf, "0x%x", addr);
-    fprintf(f, "sw $v%d, %s($sp)\n", reg, buf);
+    fprintf(f, "sw $t%d, %s($sp)\n", reg, buf);
 }
 
-void print_int(int addr) {
-    fprintf(f, "li $v0, 1\n"
-               "lw $a0, %d($sp)\n"
-               "syscall\n", addr);
+void print_num(TableRecord* rec) {
+    if(rec->t->tf == FLOAT) {
+        fprintf(f, "li $v0,2\n"
+                   "l.s $f12, %d($sp)\n"
+                   "syscall\n", rec->addr);
+    }
+    else {
+        fprintf(f, "li $v0,1\n"
+                   "lw $a0, %d($sp)\n"
+                   "syscall\n", rec->addr);
+    }
 }
 
 void print_string(char* name) {
@@ -69,7 +78,7 @@ void ir_to_asm(char* out_file, listQuad l, SymbolTable* s, SymbolTable* strings)
                 load_immediate(false, it->res->addr, it->arg1->val);
                 break;
             case OP_PRINT:
-                print_int(it->arg1->addr);
+                print_num(it->arg1);
                 break;
             case OP_PRINTF:
                 print_string(it->arg1->ident);
