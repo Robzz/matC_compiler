@@ -14,11 +14,10 @@ void load_immediate(bool fp, int reg, value val) {
         store(0, rec->addr);
     }
     else {*/
-    if(fp) {
+    if (fp) {
         sprintf(buf, "%f", val.float_v);
         fprintf(f, "li.s $f%d, %s\n", reg, buf);
-    }
-    else {
+    } else {
         sprintf(buf, "%d", val.int_v);
         fprintf(f, "li $%d, %s\n", reg, buf);
     }
@@ -27,7 +26,7 @@ void load_immediate(bool fp, int reg, value val) {
 
 void load(int reg, TableRecord* rec) {
     sprintf(buf, "0x%x", rec->addr);
-    if(rec->t->tf == FLOAT)
+    if (rec->t->tf == FLOAT)
         fprintf(f, "l.s $f%d, %s($sp)\n", reg, buf);
     else
         fprintf(f, "lw $%d, %s($sp)\n", reg, buf);
@@ -35,7 +34,7 @@ void load(int reg, TableRecord* rec) {
 
 void store(int reg, TableRecord* rec) {
     sprintf(buf, "0x%x", rec->addr);
-    if(rec->t->tf == FLOAT)
+    if (rec->t->tf == FLOAT)
         fprintf(f, "s.s $f%d, %s($sp)\n", reg, buf);
     else
         fprintf(f, "sw $%d, %s($sp)\n", reg, buf);
@@ -50,29 +49,28 @@ void convert_i_to_f(int reg_i, int reg_f) {
 }
 
 void number_addition(aQuad q) {
-    if(!strcmp(q->arg1->ident, "<literal>"))
+    if (!strcmp(q->arg1->ident, "<literal>"))
         load_immediate(q->arg1->t->tf == FLOAT, T0, q->arg1->val);
     else
         load(T0, q->arg1);
-    if(!strcmp(q->arg2->ident, "<literal>"))
+    if (!strcmp(q->arg2->ident, "<literal>"))
         load_immediate(q->arg2->t->tf == FLOAT, T1, q->arg2->val);
     else
         load(T1, q->arg2);
-    if(q->arg2->t->tf == INT && q->arg1->t->tf == INT) {
+    if (q->arg2->t->tf == INT && q->arg1->t->tf == INT) {
         // Adding 2 ints
         fprintf(f, "add $t0, $t0, $t1\n");
-    }
-    else {
+    } else {
         // Float addition
-        if(q->arg2->t->tf != q->arg1->t->tf) {
+        if (q->arg2->t->tf != q->arg1->t->tf) {
             // Float and int, must cast before
-            if(q->arg1->t->tf == FLOAT)
+            if (q->arg1->t->tf == FLOAT)
                 convert_i_to_f(T0, T0);
             else
                 convert_i_to_f(T1, T1);
         }
         fprintf(f, "add.s $f%d, $f%d, $f1\n", T0, T0);
-        if(q->res->t->tf == INT) {
+        if (q->res->t->tf == INT) {
             // Cast back to int before storing
             convert_f_to_i(0, T0);
         }
@@ -80,15 +78,134 @@ void number_addition(aQuad q) {
     store(T0, q->res);
 }
 
+void number_substraction(aQuad q) {
+    if (!strcmp(q->arg1->ident, "<literal>"))
+        load_immediate(q->arg1->t->tf == FLOAT, T0, q->arg1->val);
+    else
+        load(T0, q->arg1);
+    if (!strcmp(q->arg2->ident, "<literal>"))
+        load_immediate(q->arg2->t->tf == FLOAT, T1, q->arg2->val);
+    else
+        load(T1, q->arg2);
+    if (q->arg2->t->tf == INT && q->arg1->t->tf == INT) {
+        // Substract 2 ints
+        fprintf(f, "subu $t0, $t0, $t1\n");
+    } else {
+        // Float substract
+        if (q->arg2->t->tf != q->arg1->t->tf) {
+            // Float and int, must cast before
+            if (q->arg1->t->tf == FLOAT)
+                convert_i_to_f(T0, T0);
+            else
+                convert_i_to_f(T1, T1);
+        }
+        fprintf(f, "subu.s $f%d, $f%d, $f1\n", T0, T0);
+        if (q->res->t->tf == INT) {
+            // Cast back to int before storing
+            convert_f_to_i(0, T0);
+        }
+    }
+    store(T0, q->res);
+}
+
+void number_multiplication(aQuad q) {
+    if (!strcmp(q->arg1->ident, "<literal>"))
+        load_immediate(q->arg1->t->tf == FLOAT, T0, q->arg1->val);
+    else
+        load(T0, q->arg1);
+    if (!strcmp(q->arg2->ident, "<literal>"))
+        load_immediate(q->arg2->t->tf == FLOAT, T1, q->arg2->val);
+    else
+        load(T1, q->arg2);
+    if (q->arg2->t->tf == INT && q->arg1->t->tf == INT) {
+        // Adding 2 ints
+        fprintf(f, "mul $t0, $t0, $t1\n");
+    } else {
+        // Float addition
+        if (q->arg2->t->tf != q->arg1->t->tf) {
+            // Float and int, must cast before
+            if (q->arg1->t->tf == FLOAT)
+                convert_i_to_f(T0, T0);
+            else
+                convert_i_to_f(T1, T1);
+        }
+        fprintf(f, "mul.s $f%d, $f%d, $f1\n", T0, T0);
+        if (q->res->t->tf == INT) {
+            // Cast back to int before storing
+            convert_f_to_i(0, T0);
+        }
+    }
+    store(T0, q->res);
+}
+
+void number_division(aQuad q) {
+    if (!strcmp(q->arg1->ident, "<literal>"))
+        load_immediate(q->arg1->t->tf == FLOAT, T0, q->arg1->val);
+    else
+        load(T0, q->arg1);
+    if (!strcmp(q->arg2->ident, "<literal>"))
+        load_immediate(q->arg2->t->tf == FLOAT, T1, q->arg2->val);
+    else
+        load(T1, q->arg2);
+    if (q->arg2->t->tf == INT && q->arg1->t->tf == INT) {
+        // Adding 2 ints
+        fprintf(f, "div $t0, $t0, $t1\n");
+    } else {
+        // Float addition
+        if (q->arg2->t->tf != q->arg1->t->tf) {
+            // Float and int, must cast before
+            if (q->arg1->t->tf == FLOAT)
+                convert_i_to_f(T0, T0);
+            else
+                convert_i_to_f(T1, T1);
+        }
+        fprintf(f, "div.s $f%d, $f%d, $f1\n", T0, T0);
+        if (q->res->t->tf == INT) {
+            // Cast back to int before storing
+            convert_f_to_i(0, T0);
+        }
+    }
+    store(T0, q->res);
+}
+
+void number_modulo(aQuad q) {
+//    if (!strcmp(q->arg1->ident, "<literal>"))
+//        load_immediate(q->arg1->t->tf == FLOAT, T0, q->arg1->val);
+//    else
+//        load(T0, q->arg1);
+//    if (!strcmp(q->arg2->ident, "<literal>"))
+//        load_immediate(q->arg2->t->tf == FLOAT, T1, q->arg2->val);
+//    else
+//        load(T1, q->arg2);
+//    if (q->arg2->t->tf == INT && q->arg1->t->tf == INT) {
+//        // Adding 2 ints
+//        fprintf(f, "add $t0, $t0, $t1\n");
+//    } else {
+//        // Float addition
+//        if (q->arg2->t->tf != q->arg1->t->tf) {
+//            // Float and int, must cast before
+//            if (q->arg1->t->tf == FLOAT)
+//                convert_i_to_f(T0, T0);
+//            else
+//                convert_i_to_f(T1, T1);
+//        }
+//        fprintf(f, "add.s $f%d, $f%d, $f1\n", T0, T0);
+//        if (q->res->t->tf == INT) {
+//            // Cast back to int before storing
+//            convert_f_to_i(0, T0);
+//        }
+//    }
+//    store(T0, q->res);
+}
+
 void print_num(TableRecord* rec) {
     value v;
-    if(rec->t->tf == FLOAT) {
+    if (rec->t->tf == FLOAT) {
         v.int_v = 2;
         load_immediate(false, V0, v);
         load(12, rec);
         fprintf(f, "syscall\n");
-    }
-    else {
+    } else {
         v.int_v = 1;
         load_immediate(false, V0, v);
         load(A0, rec);
@@ -101,16 +218,16 @@ void print_string(char* name) {
     v.int_v = 4;
     load_immediate(false, V0, v);
     fprintf(f, "la $a0, %s\n"
-               "syscall\n", name);
+            "syscall\n", name);
 }
 
 int allocate_stack_frame(SymbolTable* s) {
     int offset = 0;
-    for(int i = 0 ; i != N_BUCKETS ; ++i) {
+    for (int i = 0; i != N_BUCKETS; ++i) {
         RecordList* l = s->buckets[i];
-        if(!l->rec)
+        if (!l->rec)
             continue;
-        for(RecordList* it = l ; it != NULL ; it = it->next) {
+        for (RecordList* it = l; it != NULL; it = it->next) {
             it->rec->addr = offset;
             offset += type_size(it->rec->t);
         }
@@ -125,22 +242,21 @@ void ir_to_asm(char* out_file, listQuad l, SymbolTable* s, SymbolTable* strings)
     print_symbol_table(strings);
 
     fputs(".data\n", f);
-    for(int i = 0 ; i != N_BUCKETS ; ++i) {
+    for (int i = 0; i != N_BUCKETS; ++i) {
         RecordList* it = strings->buckets[i];
-        for(; it && it->rec != NULL ; it = it->next) {
+        for (; it && it->rec != NULL; it = it->next) {
             fprintf(f, "%s: .asciiz \"%s\"\n", it->rec->ident, it->rec->val.str_v);
         }
     }
     fputs(".text\n", f);
     fputs("main:\n", f);
-    for(aQuad it = l->head ; it != NULL ; it = it->next) {
-        switch(it->op) {
+    for (aQuad it = l->head; it != NULL; it = it->next) {
+        switch (it->op) {
             case OP_AFFECT:
-                if(!strcmp("<literal>", it->arg1->ident)) {
+                if (!strcmp("<literal>", it->arg1->ident)) {
                     load_immediate(it->res->t->tf == FLOAT ? true : false, T0, it->arg1->val);
                     store(T0, it->res);
-                }
-                else {
+                } else {
                     load(T0, it->arg1);
                     store(T0, it->res);
                 }
@@ -154,10 +270,22 @@ void ir_to_asm(char* out_file, listQuad l, SymbolTable* s, SymbolTable* strings)
             case OP_PLUS:
                 number_addition(it);
                 break;
+            case OP_MINUS:
+                number_substraction(it);
+                break;
+            case OP_MUL:
+                number_multiplication(it);
+                break;
+            case OP_DIV:
+                number_division(it);
+                break;
+            case OP_MOD:
+                number_modulo(it);
+                break;
         }
     }
 
     fprintf(f, "li $v0,10\n"
-               "syscall");
+            "syscall");
     fclose(f);
 }

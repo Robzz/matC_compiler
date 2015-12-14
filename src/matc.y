@@ -250,20 +250,8 @@ decrement: DECR id {
         free($1);
     }
 
-arithmetic_expr: expr PLUS expr {
-        /*
-        if($1.result->t->tf == $3.result->t->tf) {
-            if($1.result->t->tf == INT){
-                $$.result->val.int_v=$1.result->val.int_v + $3.result->val.int_v;
-            }
-            if($1.result->t->tf == FLOAT){
-                $$.result->val.float_v=$1.result->val.float_v + $3.result->val.float_v;
-            }
-        }*/
-        /* Find the destination type, according to the following rules :
-         *  * T + T -> T
-         *  * int + float -> float
-         */
+arithmetic_expr: expr PLUS expr 
+    {
         Type *dest_type,
              *t1 = $1.result ? $1.result->t : $1.code->res->t,
              *t2 = $3.result ? $3.result->t : $3.code->res->t;
@@ -282,10 +270,86 @@ arithmetic_expr: expr PLUS expr {
         addQuadTailList(list, new);
         $$.code = new;
     }
-                 | expr MINUS expr 
+                 | expr MINUS expr
+    {
+        Type *dest_type,
+             *t1 = $1.result ? $1.result->t : $1.code->res->t,
+             *t2 = $3.result ? $3.result->t : $3.code->res->t;
+        if(t1->tf == t2->tf)
+            dest_type = copy_type(t1);
+        else if((t1->tf == FLOAT && t2->tf == INT) || (t1->tf == INT && t2->tf == FLOAT))
+            dest_type = new_type(FLOAT);
+        else {
+            char buf[1024];
+            sprintf(buf, "Incompatible types %s and %s passed to operator +", type_name(t1->tf), type_name(t2->tf));
+            span_error(buf);
+        }
+        TableRecord* dest = new_record("<temp>", dest_type);
+        add_symbol(symtable, dest);
+        aQuad new = newQuad($1.result, $3.result, OP_MINUS, dest);
+        addQuadTailList(list, new);
+        $$.code = new;
+    }
                  | expr MULT expr
+    {
+        Type *dest_type,
+             *t1 = $1.result ? $1.result->t : $1.code->res->t,
+             *t2 = $3.result ? $3.result->t : $3.code->res->t;
+        if(t1->tf == t2->tf)
+            dest_type = copy_type(t1);
+        else if((t1->tf == FLOAT && t2->tf == INT) || (t1->tf == INT && t2->tf == FLOAT))
+            dest_type = new_type(FLOAT);
+        else {
+            char buf[1024];
+            sprintf(buf, "Incompatible types %s and %s passed to operator +", type_name(t1->tf), type_name(t2->tf));
+            span_error(buf);
+        }
+        TableRecord* dest = new_record("<temp>", dest_type);
+        add_symbol(symtable, dest);
+        aQuad new = newQuad($1.result, $3.result, OP_MUL, dest);
+        addQuadTailList(list, new);
+        $$.code = new;
+    }
                  | expr DIV expr
+    {
+        Type *dest_type,
+             *t1 = $1.result ? $1.result->t : $1.code->res->t,
+             *t2 = $3.result ? $3.result->t : $3.code->res->t;
+        if(t1->tf == t2->tf)
+            dest_type = copy_type(t1);
+        else if((t1->tf == FLOAT && t2->tf == INT) || (t1->tf == INT && t2->tf == FLOAT))
+            dest_type = new_type(FLOAT);
+        else {
+            char buf[1024];
+            sprintf(buf, "Incompatible types %s and %s passed to operator +", type_name(t1->tf), type_name(t2->tf));
+            span_error(buf);
+        }
+        TableRecord* dest = new_record("<temp>", dest_type);
+        add_symbol(symtable, dest);
+        aQuad new = newQuad($1.result, $3.result, OP_DIV, dest);
+        addQuadTailList(list, new);
+        $$.code = new;
+    }
                  | expr MOD expr
+    {
+        Type *dest_type,
+             *t1 = $1.result ? $1.result->t : $1.code->res->t,
+             *t2 = $3.result ? $3.result->t : $3.code->res->t;
+        if(t1->tf == t2->tf)
+            dest_type = copy_type(t1);
+        else if((t1->tf == FLOAT && t2->tf == INT) || (t1->tf == INT && t2->tf == FLOAT))
+            dest_type = new_type(FLOAT);
+        else {
+            char buf[1024];
+            sprintf(buf, "Incompatible types %s and %s passed to operator +", type_name(t1->tf), type_name(t2->tf));
+            span_error(buf);
+        }
+        TableRecord* dest = new_record("<temp>", dest_type);
+        add_symbol(symtable, dest);
+        aQuad new = newQuad($1.result, $3.result, OP_MOD, dest);
+        addQuadTailList(list, new);
+        $$.code = new;
+    }
                  | MINUS expr %prec UNARY
                  | PLUS expr %prec UNARY
                  | TILDE expr %prec UNARY

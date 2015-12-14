@@ -1,6 +1,10 @@
 int main() {
     int i = 42, j = 43;
-    int k = 5 + 2;
+    int k = i + j;
+    int l= 6 / 2;
+    int m = 5 - 3;
+    int n = 5 * 3;
+    
     float f = 42.314;
     printf("i = ");
     print(i);
@@ -8,6 +12,12 @@ int main() {
     print(j);
     printf(", k = ");
     print(k);
+    printf(", l = ");
+    print(l);
+    printf(", m = ");
+    print(m);
+    printf(", n = ");
+    print(n);
     printf("\nf = ");
     print(f);
     printf("\n");

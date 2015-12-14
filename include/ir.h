@@ -48,6 +48,14 @@ void convert_i_to_f(int reg_i, int reg_f);
 
 void number_addition(aQuad q);
 
+void number_substraction(aQuad q);
+
+void number_multiplication(aQuad q);
+
+void number_division(aQuad q);
+
+void number_modulo(aQuad q);
+
 void print_num(TableRecord* rec);
 
 void print_string();

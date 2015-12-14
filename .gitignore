@@ -43,6 +43,7 @@ tests/unit/symtable
 tests/unit/quad
 tests/unit/types
 .vimrc
+out.s
 
 #Directory generate by netbeans
 nbproject
