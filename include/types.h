@@ -7,9 +7,15 @@
 
 #include <stdlib.h>
 
+typedef union {
+    int int_v;
+    float float_v;
+    char* str_v;
+} value;
+
 typedef enum { false, true } bool;
 
-typedef enum { INT, FLOAT, MATRIX, ARRAY } TypeFamily;
+typedef enum { INT, FLOAT, MATRIX, ARRAY, STRING } TypeFamily;
 
 struct Type_s;
 

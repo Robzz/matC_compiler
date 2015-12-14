@@ -9,7 +9,9 @@
 #include "symbol_table.h"
 
 /* Available arithmetic and logic operations */
-typedef enum { OP_PLUS, OP_MINUS, OP_MUL, OP_DIV, OP_MOD, OP_UNARY_MINUS } Op;
+typedef enum { OP_PLUS, OP_MINUS, OP_MUL, OP_DIV, OP_MOD, OP_UNARY_MINUS, OP_AFFECT, OP_PRINT, OP_PRINTF } Op;
+
+const char* op_to_string(Op o);
 
 typedef struct quad {
     int label;

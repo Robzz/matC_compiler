@@ -31,7 +31,7 @@ STRING_LITERAL \"[^"]*\"
                       float f = strtof(yytext, NULL); 
                       yylval.f = f;
                       return fp; }
-{STRING_LITERAL}          { DBG(printf("Lex : string literal : %s\n", yytext)); return STRING; }
+{STRING_LITERAL}          { DBG(printf("Lex : string literal : %s\n", yytext)); yylval.s = malloc((yyleng-1)*sizeof(char)); strncpy(yylval.s, yytext+1, yyleng-2); yylval.s[yyleng-2] = 0; return string; }
 {DEC_INT_LITERAL}   { DBG(printf("Lex : integer %s\n", yytext)); yylval.i = atoi(yytext); return integer; }
 return    { DBG(printf("Lex : return\n")); return RETURN; }
 const     { DBG(printf("Lex : const\n")); return CONST; }

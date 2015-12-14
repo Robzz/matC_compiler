@@ -1,6 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "quad.h"
+#include "debug.h"
+
+const char* op_to_string(Op o) {
+    return (o == OP_PLUS) ?        "OP_PLUS" :
+           (o == OP_MINUS) ?       "OP_MINUS" :
+           (o == OP_MUL) ?         "OP_MUL" :
+           (o == OP_DIV) ?         "OP_DIV" :
+           (o == OP_MOD) ?         "OP_MOD" :
+           (o == OP_UNARY_MINUS) ? "OP_UNARY_MINUS" :
+           (o == OP_AFFECT) ?      "OP_AFFECT" :
+           (o == OP_PRINT) ?       "OP_PRINT" :
+           (o == OP_PRINTF) ?      "OP_PRINTF" :
+                                   UNREACHABLE();
+}
 
 aQuad newQuad(TableRecord * arg1, TableRecord * arg2, Op op, TableRecord * res) {
     aQuad new = malloc(sizeof (struct quad));
@@ -105,15 +119,32 @@ void printList(listQuad quads) {
 void printQuad(aQuad quad) {
     if (quad != NULL) {
         printf("label : %d\n", quad->label);
-        printf("%s : ", quad->arg1->ident);
-        print_type(quad->arg1->t);
-        printf("\n");
-        printf("%s : ", quad->arg2->ident);
-        print_type(quad->arg2->t);
-        printf("\n");
-        printf("op : %c\n", quad->op);
-        printf("%s : ", quad->res->ident);
-        print_type(quad->res->t);
-        printf("\n");
+        printf("arg1 : ");
+        if(quad->arg1) {
+            if(quad->arg1->ident)
+                printf("%s ", quad->arg1->ident);
+            printf("(");
+            print_type(quad->arg1->t);
+            printf(")\n");
+        }
+        else
+            printf("NULL\n");
+        printf("arg2 : ");
+        if(quad->arg2) {
+            printf("%s (", quad->arg2->ident);
+            print_type(quad->arg2->t);
+            printf(")\n");
+        }
+        else
+            printf("NULL\n");
+        printf("op : %s\n", op_to_string(quad->op));
+        printf("res : ");
+        if(quad->arg2) {
+            printf("%s (", quad->res->ident);
+            print_type(quad->res->t);
+            printf(")\n");
+        }
+        else
+            printf("NULL\n");
     }
 }

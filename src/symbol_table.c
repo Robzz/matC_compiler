@@ -11,11 +11,14 @@ TableRecord* new_record(char* ident, Type* t) {
     strncpy(rec->ident, ident, n);
     rec->t = t;
     rec->id = id++;
+    rec->addr = NULL;
     return rec;
 }
 
 void delete_record(TableRecord* rec) {
     free(rec->ident);
+    if(rec->t->tf == STRING && rec->val.str_v)
+        free(rec->val.str_v);
     delete_type(rec->t);
     free(rec);
 }

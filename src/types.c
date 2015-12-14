@@ -52,6 +52,9 @@ void print_type(const Type* t) {
             if(t->arr_info->elem_t->tf == MATRIX)
                 printf("[%lu]", t->arr_info->elem_t->arr_info->size);
             break;
+        case STRING:
+            printf("string");
+            break;
         case ARRAY:
             printf("array");
             const Type* tt = t; 
@@ -62,6 +65,14 @@ void print_type(const Type* t) {
             print_type(tt);
             printf(")");
             break;
+    }
+}
+
+size_t type_size(Type* t) {
+    if(t->tf == INT || t->tf == FLOAT)
+        return 4;
+    else {
+        return t->arr_info->size * type_size(t->arr_info->elem_t);
     }
 }
 

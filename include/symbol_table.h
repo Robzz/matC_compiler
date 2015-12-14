@@ -10,10 +10,8 @@ typedef struct {
     char* ident; 
     Type* t;
     unsigned int id;
-    union {
-        int int_v;
-        float float_v;
-    } value;
+    value val;
+    int addr;
 } TableRecord;
 
 /* Create a new symbol table record */
@@ -35,7 +33,7 @@ void list_add_record(RecordList* l, TableRecord* rec);
 /* Look for a symbol in a list */
 TableRecord* list_search_record(RecordList* l, const char* name);
 
-/* The actual symbl table */
+/* The actual symbol table */
 typedef struct {
     RecordList** buckets;
 } SymbolTable;
