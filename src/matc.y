@@ -321,7 +321,7 @@ arithmetic_expr: expr PLUS expr
             dest_type = new_type(FLOAT);
         else {
             char buf[1024];
-            sprintf(buf, "Incompatible types %s and %s passed to operator +", type_name(t1->tf), type_name(t2->tf));
+            sprintf(buf, "Incompatible types %s and %s passed to operator /", type_name(t1->tf), type_name(t2->tf));
             span_error(buf);
         }
         TableRecord* dest = new_record("<temp>", dest_type);
@@ -332,19 +332,14 @@ arithmetic_expr: expr PLUS expr
     }
                  | expr MOD expr
     {
-        Type *dest_type,
-             *t1 = $1.result ? $1.result->t : $1.code->res->t,
+        Type *t1 = $1.result ? $1.result->t : $1.code->res->t,
              *t2 = $3.result ? $3.result->t : $3.code->res->t;
-        if(t1->tf == t2->tf)
-            dest_type = copy_type(t1);
-        else if((t1->tf == FLOAT && t2->tf == INT) || (t1->tf == INT && t2->tf == FLOAT))
-            dest_type = new_type(FLOAT);
-        else {
+        if(t1->tf != INT || t2->tf != INT) {
             char buf[1024];
-            sprintf(buf, "Incompatible types %s and %s passed to operator +", type_name(t1->tf), type_name(t2->tf));
+            sprintf(buf, "Incompatible types %s and %s passed to operator %%", type_name(t1->tf), type_name(t2->tf));
             span_error(buf);
         }
-        TableRecord* dest = new_record("<temp>", dest_type);
+        TableRecord* dest = new_record("<temp>", new_type(INT));
         add_symbol(symtable, dest);
         aQuad new = newQuad($1.result, $3.result, OP_MOD, dest);
         addQuadTailList(list, new);

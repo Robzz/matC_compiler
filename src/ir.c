@@ -168,34 +168,18 @@ void number_division(aQuad q) {
     store(T0, q->res);
 }
 
-void number_modulo(aQuad q) {
-//    if (!strcmp(q->arg1->ident, "<literal>"))
-//        load_immediate(q->arg1->t->tf == FLOAT, T0, q->arg1->val);
-//    else
-//        load(T0, q->arg1);
-//    if (!strcmp(q->arg2->ident, "<literal>"))
-//        load_immediate(q->arg2->t->tf == FLOAT, T1, q->arg2->val);
-//    else
-//        load(T1, q->arg2);
-//    if (q->arg2->t->tf == INT && q->arg1->t->tf == INT) {
-//        // Adding 2 ints
-//        fprintf(f, "add $t0, $t0, $t1\n");
-//    } else {
-//        // Float addition
-//        if (q->arg2->t->tf != q->arg1->t->tf) {
-//            // Float and int, must cast before
-//            if (q->arg1->t->tf == FLOAT)
-//                convert_i_to_f(T0, T0);
-//            else
-//                convert_i_to_f(T1, T1);
-//        }
-//        fprintf(f, "add.s $f%d, $f%d, $f1\n", T0, T0);
-//        if (q->res->t->tf == INT) {
-//            // Cast back to int before storing
-//            convert_f_to_i(0, T0);
-//        }
-//    }
-//    store(T0, q->res);
+void int_modulus(aQuad q) {
+    if (!strcmp(q->arg1->ident, "<literal>"))
+        load_immediate(false, T0, q->arg1->val);
+    else
+        load(T0, q->arg1);
+    if (!strcmp(q->arg2->ident, "<literal>"))
+        load_immediate(false, T1, q->arg2->val);
+    else
+        load(T1, q->arg2);
+    fprintf(f, "div $t0, $t1\n"
+               "mfhi $t0\n");
+    store(T0, q->res);
 }
 
 void print_num(TableRecord* rec) {
@@ -280,7 +264,7 @@ void ir_to_asm(char* out_file, listQuad l, SymbolTable* s, SymbolTable* strings)
                 number_division(it);
                 break;
             case OP_MOD:
-                number_modulo(it);
+                int_modulus(it);
                 break;
         }
     }

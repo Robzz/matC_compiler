@@ -54,7 +54,7 @@ void number_multiplication(aQuad q);
 
 void number_division(aQuad q);
 
-void number_modulo(aQuad q);
+void int_modulus(aQuad q);
 
 void print_num(TableRecord* rec);
 
