@@ -8,7 +8,7 @@ local SUCCESS=1
 parse_args() {
     if [[ -z $@ ]]; then
         echo 'You must specify one or more test targets.'
-        echo 'Valid targets : yacc, lex, all'
+        echo 'Valid targets : yacc, lex, unit, compile-test, all'
         exit
     fi
     for arg in "$@"; do

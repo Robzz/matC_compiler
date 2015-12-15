@@ -91,7 +91,7 @@ clean:
 
 dist: clean matc_chavignat_laisne.tar.gz
 
-matc_chavignat_laisne.tar.gz: $(SRC_DIR) $(INCLUDE_DIR) Makefile tests run_tests.sh
+matc_chavignat_laisne.tar.gz: $(SRC_DIR) $(INCLUDE_DIR) Makefile tests run_tests.sh rapport.odt
 	tar -acf $@ $^
 
 # Make directories in build tree
