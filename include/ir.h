@@ -50,6 +50,8 @@ void number_addition(aQuad q);
 
 void number_substraction(aQuad q);
 
+void number_negation(aQuad q);
+
 void number_multiplication(aQuad q);
 
 void number_division(aQuad q);

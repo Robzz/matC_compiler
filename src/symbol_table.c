@@ -82,7 +82,7 @@ void add_symbol(SymbolTable* s, TableRecord* tr) {
     unsigned int h = hash_str(tr->ident);
     unsigned int i = h % N_BUCKETS;
     RecordList* l = s->buckets[i];
-    if(!list_search_record(l, tr->ident)) {
+    if(!strcmp("<temp>", tr->ident) || !list_search_record(l, tr->ident)) {
         list_add_record(l, tr);
     }
 }

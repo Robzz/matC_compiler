@@ -14,6 +14,7 @@ TypeFamily lasttype;
 RecordList* new_symbols;
 RecordList* temp_syms;
 listQuad list;
+char buf[1024];
 
 int yylex();
 void lex_free();
@@ -168,6 +169,10 @@ declaration: type_name decl_list {
             }
             t->tf = tf;
         }
+        if(lookup_symbol(symtable, it->rec->ident, NULL)) {
+            sprintf(buf, "Error : redeclaring symbol %s\n", it->rec->ident);
+            span_error(buf);
+        }
         add_symbol(symtable, it->rec);
     }
 
@@ -277,7 +282,6 @@ arithmetic_expr: expr PLUS expr
         else if((t1->tf == FLOAT && t2->tf == INT) || (t1->tf == INT && t2->tf == FLOAT))
             dest_type = new_type(FLOAT);
         else {
-            char buf[1024];
             sprintf(buf, "Incompatible types %s and %s passed to operator +", type_name(t1->tf), type_name(t2->tf));
             span_error(buf);
         }
@@ -299,8 +303,7 @@ arithmetic_expr: expr PLUS expr
         else if((t1->tf == FLOAT && t2->tf == INT) || (t1->tf == INT && t2->tf == FLOAT))
             dest_type = new_type(FLOAT);
         else {
-            char buf[1024];
-            sprintf(buf, "Incompatible types %s and %s passed to operator +", type_name(t1->tf), type_name(t2->tf));
+            sprintf(buf, "Incompatible types %s and %s passed to operator -", type_name(t1->tf), type_name(t2->tf));
             span_error(buf);
         }
         TableRecord* dest = new_record("<temp>", dest_type);
@@ -321,7 +324,6 @@ arithmetic_expr: expr PLUS expr
         else if((t1->tf == FLOAT && t2->tf == INT) || (t1->tf == INT && t2->tf == FLOAT))
             dest_type = new_type(FLOAT);
         else {
-            char buf[1024];
             sprintf(buf, "Incompatible types %s and %s passed to operator +", type_name(t1->tf), type_name(t2->tf));
             span_error(buf);
         }
@@ -343,7 +345,6 @@ arithmetic_expr: expr PLUS expr
         else if((t1->tf == FLOAT && t2->tf == INT) || (t1->tf == INT && t2->tf == FLOAT))
             dest_type = new_type(FLOAT);
         else {
-            char buf[1024];
             sprintf(buf, "Incompatible types %s and %s passed to operator /", type_name(t1->tf), type_name(t2->tf));
             span_error(buf);
         }
@@ -360,7 +361,6 @@ arithmetic_expr: expr PLUS expr
         Type *t1 = $1.result ? $1.result->t : $1.code->res->t,
              *t2 = $3.result ? $3.result->t : $3.code->res->t;
         if(t1->tf != INT || t2->tf != INT) {
-            char buf[1024];
             sprintf(buf, "Incompatible types %s and %s passed to operator %%", type_name(t1->tf), type_name(t2->tf));
             span_error(buf);
         }
@@ -371,9 +371,25 @@ arithmetic_expr: expr PLUS expr
         $$.code = new;
 #endif
     }
-                 | MINUS expr %prec UNARY
-                 | PLUS expr %prec UNARY
-                 | TILDE expr %prec UNARY
+                 | MINUS expr %prec UNARY {
+#ifndef PARSER_TEST_BUILD
+        TableRecord* rec = new_record("<temp>", copy_type($2.result->t));
+        add_symbol(symtable, rec);
+        aQuad q = newQuad($2.result, NULL, OP_UNARY_MINUS, rec);
+        addQuadTailList(list, q);
+        $$.code = q;
+#endif
+}
+                 | PLUS expr %prec UNARY {
+#ifndef PARSER_TEST_BUILD
+
+#endif
+}
+                 | TILDE expr %prec UNARY {
+#ifndef PARSER_TEST_BUILD
+
+#endif
+}
 boolean_expr: expr AND expr { DBG(printf("Yacc : AND expression\n")); }
               | expr OR expr { DBG(printf("Yacc : OR expression\n")); }
               | '!' expr { DBG(printf("Yacc : NOT expression\n")); }

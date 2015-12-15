@@ -89,7 +89,7 @@ void number_substraction(aQuad q) {
         load(T1, q->arg2);
     if (q->arg2->t->tf == INT && q->arg1->t->tf == INT) {
         // Substract 2 ints
-        fprintf(f, "subu $t0, $t0, $t1\n");
+        fprintf(f, "sub $t0, $t0, $t1\n");
     } else {
         // Float substract
         if (q->arg2->t->tf != q->arg1->t->tf) {
@@ -99,13 +99,26 @@ void number_substraction(aQuad q) {
             else
                 convert_i_to_f(T1, T1);
         }
-        fprintf(f, "subu.s $f%d, $f%d, $f1\n", T0, T0);
+        fprintf(f, "sub.s $f%d, $f%d, $f1\n", T0, T0);
         if (q->res->t->tf == INT) {
             // Cast back to int before storing
             convert_f_to_i(0, T0);
         }
     }
     store(T0, q->res);
+}
+
+void number_negation(aQuad q) {
+    if(q->arg1->t->tf == INT) {
+        load(T0, q->arg1);
+        fprintf(f, "neg $t1, $t0\n");
+        store(T1, q->res);
+    }
+    else {
+        load(0, q->arg1);
+        fprintf(f, "neg.s $f1, $f0\n");
+        store(1, q->res);
+    }
 }
 
 void number_multiplication(aQuad q) {
@@ -237,7 +250,10 @@ void ir_to_asm(char* out_file, listQuad l, SymbolTable* s, SymbolTable* strings)
     for (aQuad it = l->head; it != NULL; it = it->next) {
         switch (it->op) {
             case OP_AFFECT:
-                if (!strcmp("<literal>", it->arg1->ident)) {
+                if(it->res->t->tf == MATRIX || it->res->t->tf == ARRAY) {
+                    // TODO
+                }
+                else if (!strcmp("<literal>", it->arg1->ident)) {
                     load_immediate(it->res->t->tf == FLOAT ? true : false, T0, it->arg1->val);
                     store(T0, it->res);
                 } else {
@@ -256,6 +272,9 @@ void ir_to_asm(char* out_file, listQuad l, SymbolTable* s, SymbolTable* strings)
                 break;
             case OP_MINUS:
                 number_substraction(it);
+                break;
+            case OP_UNARY_MINUS:
+                number_negation(it);
                 break;
             case OP_MUL:
                 number_multiplication(it);

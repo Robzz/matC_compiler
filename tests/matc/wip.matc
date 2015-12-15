@@ -9,7 +9,7 @@ int main() {
     int mod = 19 % 7;
     int mul = 5 * 3;
     
-    float f = 42.314;
+    float f2 = 42.314;
     printf("i = ");
     print(i);
     printf(" (42), j = ");
@@ -30,5 +30,7 @@ int main() {
     print(mod);
     printf(" (5), mul = ");
     print(mul);
-    printf(" (15)\n");
+    printf(" (15)\nf2 = ");
+    print(f2);
+    printf(" (42.314)\n");
 }

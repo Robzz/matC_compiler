@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "types.h"
 #include <assert.h>
 #include <stdio.h>
@@ -66,6 +67,7 @@ char* type_name(TypeFamily tf) {
         case STRING:
             return "string";
     }
+    return (char*)(UNREACHABLE());
 }
 
 void print_type(const Type* t) {
