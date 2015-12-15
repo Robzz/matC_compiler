@@ -93,17 +93,21 @@ return: RETURN expr { DBG(printf("Yacc : return statement\n")); }
 /* Literal values */
 number : integer {  
         DBG(printf("Yacc : int %d\n", $1));
+#ifndef PARSER_TEST_BUILD
         $$.result = new_record("<literal>", new_type(INT));
         $$.result->val.int_v = $1;
         $$.code = NULL;
         list_add_record(temp_syms, $$.result);
+#endif
     }
          | fp {
+#ifndef PARSER_TEST_BUILD
         DBG(printf("Yacc : float %f\n", $1)); 
         $$.result = new_record("<literal>", new_type(FLOAT));
         $$.result->val.float_v = $1;
         $$.code = NULL;
         list_add_record(temp_syms, $$.result);
+#endif
     }
 
 number_list: number
@@ -117,7 +121,7 @@ matrix_value: matrix_line
 
 matrix_line: OPBRACKET number_list CLBRACKET { DBG(printf("Yacc : matrix line\n")); }
 
-matrix_extraction: expr '[' interval_list ']' { printf("Yacc : matrix extraction\n"); }
+matrix_extraction: expr '[' interval_list ']' { DBG(printf("Yacc : matrix extraction\n")); }
 
 interval_list: interval_list ';' interval
                | interval
@@ -153,6 +157,7 @@ matrix_element_assignment: matrix_extraction AFFECT expr
 
 /* Declarations and initializations */
 declaration: type_name decl_list { 
+#ifndef PARSER_TEST_BUILD
     // Correct the types for non-array elements
     for(RecordList* it = new_symbols ; it != NULL ; it = it->next) {
         TypeFamily tf = typename_to_typefamily($1);
@@ -169,6 +174,7 @@ declaration: type_name decl_list {
     // "Clear" the list
     new_symbols->rec = NULL;
     new_symbols->next = NULL;
+#endif
 }
 
 decl_list: decl_or_init
@@ -179,27 +185,34 @@ decl_or_init: decl_id
 
 decl_id: id {
         DBG(printf("Yacc : declaring variable %s\n", $1));
+#ifndef PARSER_TEST_BUILD
         // Types are wrong, they're fixed in the declaration rule
         TableRecord* rec = new_record($1, new_type(FLOAT));
         list_add_record(new_symbols, rec);
         $$.result = rec;
         $$.code = NULL;
+#endif
     }
          | id '[' integer ']' {
         DBG(printf("Yacc : declaring 1D matrix %s (size %d)\n", $1, $3));
+#ifndef PARSER_TEST_BUILD
         list_add_record(new_symbols, new_record($1, new_matrix_type(1, $3)));
         $$.result = list_search_record(new_symbols, $1);
         $$.code = NULL;
+#endif
     }
          | id '[' integer ']' '[' integer ']' {
         DBG(printf("Yacc : declaring 2D matrix %s (size (%d,%d))\n", $1, $3, $6));
+#ifndef PARSER_TEST_BUILD
         list_add_record(new_symbols, new_record($1, new_matrix_type($3, $6)));
         $$.result = list_search_record(new_symbols, $1);
         $$.code = NULL;
+#endif
 }
 
 initialization: decl_id AFFECT expr {
         DBG(printf("Yacc : initializing variable\n"));
+#ifndef PARSER_TEST_BUILD
         aQuad q;
         if($3.code)
             // Initializing from operation
@@ -210,6 +223,7 @@ initialization: decl_id AFFECT expr {
         }
         addQuadTailList(list, q);
         $$ = $1;
+#endif
     }
 
 line_list: matrix_line
@@ -218,10 +232,12 @@ line_list: matrix_line
 /* expressions */
 expr: OPPAR expr CLPAR { $$ = $2; }
       | id {
+#ifndef PARSER_TEST_BUILD
         TableRecord * tmp;
         lookup_symbol(symtable, $1, &tmp);
         $$.result = tmp;
         $$.code=NULL;
+#endif
         free($1);
     }
       | value { $$ = $1; }
@@ -252,6 +268,7 @@ decrement: DECR id {
 
 arithmetic_expr: expr PLUS expr 
     {
+#ifndef PARSER_TEST_BUILD
         Type *dest_type,
              *t1 = $1.result ? $1.result->t : $1.code->res->t,
              *t2 = $3.result ? $3.result->t : $3.code->res->t;
@@ -269,9 +286,11 @@ arithmetic_expr: expr PLUS expr
         aQuad new = newQuad($1.result, $3.result, OP_PLUS, dest);
         addQuadTailList(list, new);
         $$.code = new;
+#endif
     }
                  | expr MINUS expr
     {
+#ifndef PARSER_TEST_BUILD
         Type *dest_type,
              *t1 = $1.result ? $1.result->t : $1.code->res->t,
              *t2 = $3.result ? $3.result->t : $3.code->res->t;
@@ -289,9 +308,11 @@ arithmetic_expr: expr PLUS expr
         aQuad new = newQuad($1.result, $3.result, OP_MINUS, dest);
         addQuadTailList(list, new);
         $$.code = new;
+#endif
     }
                  | expr MULT expr
     {
+#ifndef PARSER_TEST_BUILD
         Type *dest_type,
              *t1 = $1.result ? $1.result->t : $1.code->res->t,
              *t2 = $3.result ? $3.result->t : $3.code->res->t;
@@ -309,9 +330,11 @@ arithmetic_expr: expr PLUS expr
         aQuad new = newQuad($1.result, $3.result, OP_MUL, dest);
         addQuadTailList(list, new);
         $$.code = new;
+#endif
     }
                  | expr DIV expr
     {
+#ifndef PARSER_TEST_BUILD
         Type *dest_type,
              *t1 = $1.result ? $1.result->t : $1.code->res->t,
              *t2 = $3.result ? $3.result->t : $3.code->res->t;
@@ -329,9 +352,11 @@ arithmetic_expr: expr PLUS expr
         aQuad new = newQuad($1.result, $3.result, OP_DIV, dest);
         addQuadTailList(list, new);
         $$.code = new;
+#endif
     }
                  | expr MOD expr
     {
+#ifndef PARSER_TEST_BUILD
         Type *t1 = $1.result ? $1.result->t : $1.code->res->t,
              *t2 = $3.result ? $3.result->t : $3.code->res->t;
         if(t1->tf != INT || t2->tf != INT) {
@@ -344,6 +369,7 @@ arithmetic_expr: expr PLUS expr
         aQuad new = newQuad($1.result, $3.result, OP_MOD, dest);
         addQuadTailList(list, new);
         $$.code = new;
+#endif
     }
                  | MINUS expr %prec UNARY
                  | PLUS expr %prec UNARY
@@ -364,6 +390,7 @@ condition: IF OPPAR expr CLPAR block
 
 /* function call */
 function_call: id OPPAR string CLPAR {
+#ifndef PARSER_TEST_BUILD
         static int nstrings = 0;
         if(strcmp("printf", $1)) {
             // Error : only printf accepts strings
@@ -382,27 +409,34 @@ function_call: id OPPAR string CLPAR {
             aQuad q = newQuad(rec, NULL, OP_PRINTF, NULL);
             addQuadTailList(list, q);
         }
+#endif
         free($1);
 }
                | id OPPAR parameter_list CLPAR {
         DBG(printf("Yacc : calling function %s\n", $1));
+#ifndef PARSER_TEST_BUILD
         // TODO : check parameters validity
         if(!strcmp("print", $1)) {
             aQuad q = newQuad($3->rec, NULL, OP_PRINT, NULL);
             addQuadTailList(list, q);
         }
         free($3);
+#endif
         free($1);
     }
 
 parameter_list: { $$ = NULL; }
                 | expr {
+#ifndef PARSER_TEST_BUILD
         $$ = new_record_list();
         list_add_record($$, $1.result);
+#endif
 }
                 | parameter_list ',' expr {
+#ifndef PARSER_TEST_BUILD
         list_add_record($1, $3.result);
         $$ = $1;
+#endif
     }
 
 /*loop declaration*/
@@ -431,12 +465,15 @@ int main(int argc, char** argv) {
 #ifdef DEBUG
 //    yydebug = 1;
 #endif
+#ifndef PARSER_TEST_BUILD
     symtable = new_symbol_table();
     static_strings = new_symbol_table();
     new_symbols = new_record_list();
     temp_syms = new_record_list();
     list = newQuadList();
+#endif
     int r = yyparse();
+#ifndef PARSER_TEST_BUILD
     printf("content symbol table : \n");
     print_symbol_table(symtable);
     printf("content quad list : \n");
@@ -449,6 +486,7 @@ int main(int argc, char** argv) {
     delete_record_list(temp_syms);
     delete_symbol_table(symtable);
     delete_symbol_table(static_strings);
+#endif
     lex_free();
     return r;
 }
